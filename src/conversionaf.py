@@ -231,11 +231,7 @@ def isSelectFigura(click,x,y,opciones,nfig):
     if click:
         fig=0
         for op in opciones:
-            if op['fig'].collidepoint(x,y) and not(op['selected']):
-                #
-                updateSelect(opciones)
-                op['selected'] = True
-                #
+            if op['fig'].collidepoint(x,y):
                 limpiarFiguras()
                 cargarFiguras(fig)
                 pygame.draw.rect(screen, BLUE, op['fig'], 3)
