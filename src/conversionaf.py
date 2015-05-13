@@ -45,6 +45,8 @@ def Rectangulo(x,y,color,nTam):
     pygame.draw.rect(screen, BLACK, rec,1) #borde
     pygame.display.update()
 
+
+
 def Elipse(x,y,color,circulo,nTam):
     a = 25+25*nTam
     b = 40+40*nTam
@@ -57,14 +59,33 @@ def Elipse(x,y,color,circulo,nTam):
     rec.centery=y
     pygame.draw.ellipse(screen, color, rec) 
     pygame.draw.ellipse(screen, BLACK, rec, 1) #borde
+    
 
+
+
+def dibEstado(x,y,estado):
+    tam = 40
+    rec = pygame.Rect(0,0,tam,tam)
+    rec.centerx=x
+    rec.centery=y
+    pygame.draw.ellipse(screen, BLACK, rec, 1) #borde
+    
+    text = "q"+str(estado)
+    fuente = pygame.font.Font(None, 18)
+    msj = fuente.render(text, 1, BLACK)
+    msjpos = msj.get_rect()
+    msjpos.centerx = x
+    msjpos.centery = y
+    #screen.fill((30, 145, 255))
+    #screen.blit(mensaje, (xIni+dis-3, yIni-10))
+    screen.blit(msj, msjpos)
 
 
 def cargarFiguras(figura):
     aR=40 # Ancho Recuadro
     aI=25 # Ancho Imagen
-    xIni=80 # Posicion x Inicial donde empieza a impantar
-    yIni=25 # Posicion y Inicial donde empieza a impantar
+    xIni=80 # Posicion x Inicial donde empieza a pintar
+    yIni=25 # Posicion y Inicial donde empieza a pintar
     dis = 42 # Distancia entre cada recuadro
     
     figuras = []
@@ -82,7 +103,7 @@ def cargarFiguras(figura):
         pygame.draw.rect(screen, GREEN, cuadro)
     pygame.draw.rect(screen, BLACK, cuadro,1)
     #figuras.append(recuadro1)
-    figuras.append({'fig':recuadro1,'selected':False})
+    figuras.append({'rec':recuadro1,'selected':False})
     
     
     #circulo
@@ -90,8 +111,22 @@ def cargarFiguras(figura):
     recuadro2.centerx=xIni+dis
     recuadro2.centery=yIni
     #figuras.append(recuadro2)
-    figuras.append({'fig':recuadro2,'selected':False})
+    figuras.append({'rec':recuadro2,'selected':False})
+    
+    #fuente
+    text = "q1"
+    fuente = pygame.font.Font(None, 18)
+    mensaje = fuente.render(text, 1, BLACK)
+    msjpos = mensaje.get_rect()
+    msjpos.centerx = xIni+dis
+    msjpos.centery = yIni
+    #screen.fill((30, 145, 255))
+    #screen.blit(mensaje, (xIni+dis-3, yIni-10))
+    screen.blit(mensaje, msjpos)
+    #pygame.display.flip()
+    
     pygame.draw.rect(screen, BLACK, recuadro2,1)
+    
     #imagen Interna
     circulo = pygame.Rect(0,0,aI,aI)
     circulo.centerx = xIni+dis
@@ -106,7 +141,7 @@ def cargarFiguras(figura):
     recuadro3.centerx=xIni+2*dis
     recuadro3.centery=yIni
     #figuras.append(recuadro3)
-    figuras.append({'fig':recuadro3,'selected':False})
+    figuras.append({'rec':recuadro3,'selected':False})
     pygame.draw.rect(screen, BLACK, recuadro3,1)
     #imagen Interna
     elipse = pygame.Rect(0,0,aI+10,aI)
@@ -132,7 +167,9 @@ def cargarColores(nColor):
         recuadro = pygame.Rect(0,0,aR,aR)
         recuadro.centerx = xIni
         recuadro.centery = yIni
-        rColores.append(recuadro)
+        #rColores.append(recuadro)
+        rColores.append({'rec':recuadro,'selected':False})
+        
         pygame.draw.rect(screen, BLACK, recuadro,1)
         cuadroColor = pygame.Rect(0,0,aI,aI)
         cuadroColor.centerx = xIni
@@ -197,24 +234,28 @@ def limpiarTam():
 # Resalta las opcion del menu principal (2x2 4x4 6x6)
 def isOverFigura(x,y,opciones,nFig):
     for op in opciones:
-        if op['fig'].collidepoint(x,y) and not(op['selected']):
-            #
+        if op['rec'].collidepoint(x,y) and not(op['selected']):
+            # Limpia la opcion seleccionada anteriormente
             updateSelect(opciones)
             op['selected'] = True
-            #
+            # Repintar Recuadro de figuras
             limpiarFiguras()
             cargarFiguras(nFig)
-            pygame.draw.rect(screen, BLUE, op['fig'], 3)
+            pygame.draw.rect(screen, BLUE, op['rec'], 3)
             pygame.display.update()
             break;
 
 # Resalta las opcion del menu principal (2x2 4x4 6x6)
 def isOverColores(x,y,opciones,nColor):
     for op in opciones:
-        if op.collidepoint(x,y):
+        if op['rec'].collidepoint(x,y) and not(op['selected']):
+            # Limpia la opcion seleccionada anteriormente
+            updateSelect(opciones)
+            op['selected'] = True
+            # Repintar Recuadro de figuras
             limpiarColores()
             cargarColores(nColor)
-            pygame.draw.rect(screen, BLUE, op, 3)
+            pygame.draw.rect(screen, BLUE, op['rec'], 3)
             pygame.display.update()
             break;
 
@@ -231,10 +272,10 @@ def isSelectFigura(click,x,y,opciones,nfig):
     if click:
         fig=0
         for op in opciones:
-            if op['fig'].collidepoint(x,y):
+            if op['rec'].collidepoint(x,y):
                 limpiarFiguras()
                 cargarFiguras(fig)
-                pygame.draw.rect(screen, BLUE, op['fig'], 3)
+                pygame.draw.rect(screen, BLUE, op['rec'], 3)
                 pygame.display.update()
                 return fig
             fig+=1
@@ -248,10 +289,10 @@ def isSelectColor(click,x,y,opciones,nColor):
     if click:
         color=0
         for op in opciones:
-            if op.collidepoint(x,y):
+            if op['rec'].collidepoint(x,y):
                 limpiarColores()
                 cargarColores(color)
-                pygame.draw.rect(screen, BLUE, op, 3)
+                pygame.draw.rect(screen, BLUE, op['rec'], 3)
                 pygame.display.update()
                 return color
             color+=1
@@ -271,10 +312,14 @@ def isSelectTam(click,x,y,opciones,nTam):
     return nTam
 
 
-def isClickedGrid(click,x,y,nfig,nColor,nTam):
+#def isClickedGrid(click,x,y,nfig,nColor,nTam):
+def isClickedGrid(click,x,y,estado):
     if click:
         if GRID.collidepoint(x,y):
-            pintarFigura(x,y,nfig,nColor,nTam)
+            #pintarFigura(x,y,nfig,nColor,nTam)
+            dibEstado(x,y,estado)
+            return estado+1
+    return estado
 
 def pintarFigura(x,y,nfig,nColor,nTam):
     color = COLORES[nColor]
@@ -308,6 +353,8 @@ def main():
     colores = cargarColores(nColor)
     tams    = cargarTam(nTam)
     
+    estado=0
+    
     print figuras
     print colores
     print tams
@@ -334,7 +381,8 @@ def main():
             nFig   = isSelectFigura(clicked,mousex,mousey,figuras,nFig)
             nColor = isSelectColor (clicked,mousex,mousey,colores,nColor)
             nTam   = isSelectTam (clicked,mousex,mousey,tams,nTam)
-            isClickedGrid(clicked,mousex,mousey,nFig,nColor,nTam)
+            #isClickedGrid(clicked,mousex,mousey,nFig,nColor,nTam)
+            estado = isClickedGrid(clicked,mousex,mousey,estado)
 
             pygame.display.flip()
                          
