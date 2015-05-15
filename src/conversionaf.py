@@ -36,34 +36,6 @@ GRID = pygame.Rect(80,80,640,450)
 COLORES = (GREEN,BLUE,RED,YELLOW)
 
 
-def Rectangulo(x,y,color,nTam):
-    a = 25+25*nTam
-    rec = pygame.Rect(0,0,a,a)
-    
-    rec.centerx=x
-    rec.centery=y
-    pygame.draw.rect(screen, color, rec)
-    pygame.draw.rect(screen, BLACK, rec,1) #borde
-    pygame.display.update()
-
-
-
-def Elipse(x,y,color,circulo,nTam):
-    a = 25+25*nTam
-    b = 40+40*nTam
-    c = 25+25*nTam
-    if circulo:
-        rec = pygame.Rect(0,0,a,a)
-    else:    
-        rec = pygame.Rect(0,0,b,c)
-    rec.centerx=x
-    rec.centery=y
-    pygame.draw.ellipse(screen, color, rec) 
-    pygame.draw.ellipse(screen, BLACK, rec, 1) #borde
-    
-
-
-
 def dibEstado(x,y,estado,aceptacion=0):
     tam = 40
     rec = pygame.Rect(0,0,tam,tam)
@@ -201,79 +173,6 @@ def cargarPanelEstados(estado):
     return figuras
     
 
-def cargarFiguras(figura):
-    aR=40 # Ancho Recuadro
-    aI=25 # Ancho Imagen
-    xIni=80 # Posicion x Inicial donde empieza a pintar
-    yIni=25 # Posicion y Inicial donde empieza a pintar
-    dis = 42 # Distancia entre cada recuadro
-    
-    figuras = []
-    
-    #cuadrado
-    recuadro1 = pygame.Rect(0,0,aR,aR)
-    recuadro1.centerx=xIni
-    recuadro1.centery=yIni
-    pygame.draw.rect(screen, BLACK, recuadro1,1)
-    #imagen Interna
-    cuadro = pygame.Rect(0,0,aI,aI)
-    cuadro.centerx=xIni
-    cuadro.centery=yIni
-    if(figura==0):
-        pygame.draw.rect(screen, GREEN, cuadro)
-    pygame.draw.rect(screen, BLACK, cuadro,1)
-    #figuras.append(recuadro1)
-    figuras.append({'rec':recuadro1,'selected':False})
-    
-    
-    #circulo
-    recuadro2 = pygame.Rect(0,0,aR,aR)
-    recuadro2.centerx=xIni+dis
-    recuadro2.centery=yIni
-    #figuras.append(recuadro2)
-    figuras.append({'rec':recuadro2,'selected':False})
-    
-    #fuente
-    text = "qn"
-    fuente = pygame.font.Font(None, 18)
-    mensaje = fuente.render(text, 1, BLACK)
-    msjpos = mensaje.get_rect()
-    msjpos.centerx = xIni+dis
-    msjpos.centery = yIni
-    #screen.fill((30, 145, 255))
-    #screen.blit(mensaje, (xIni+dis-3, yIni-10))
-    screen.blit(mensaje, msjpos)
-    #pygame.display.flip()
-    
-    pygame.draw.rect(screen, BLACK, recuadro2,1)
-    
-    #imagen Interna
-    circulo = pygame.Rect(0,0,aI,aI)
-    circulo.centerx = xIni+dis
-    circulo.centery = yIni
-    if(figura==1):
-        pygame.draw.ellipse(screen, GREEN, circulo)
-    pygame.draw.ellipse(screen, BLACK, circulo, 1)
-    
-    
-    #elipse
-    recuadro3 = pygame.Rect(0,0,aR,aR)
-    recuadro3.centerx=xIni+2*dis
-    recuadro3.centery=yIni
-    #figuras.append(recuadro3)
-    figuras.append({'rec':recuadro3,'selected':False})
-    pygame.draw.rect(screen, BLACK, recuadro3,1)
-    #imagen Interna
-    elipse = pygame.Rect(0,0,aI+10,aI)
-    elipse.centerx = xIni+2*dis
-    elipse.centery = yIni
-    if(figura==2):
-        pygame.draw.ellipse(screen, GREEN, elipse)
-    pygame.draw.ellipse(screen, BLACK, elipse, 1)
-    
-    pygame.display.update()
-    return figuras
-
 def cargarColores(nColor):
     aR=33 # Ancho Recuadro
     aI=20 # Ancho Imagen
@@ -336,11 +235,6 @@ def cargarTam(nTam):
     return rTams
 
 
-def limpiarFiguras():
-    recuadro = pygame.Rect(0,0,800,60)
-    pygame.draw.rect(screen, WHITE, recuadro)
-    pygame.display.update()
-
 def limpiarPanelEstados():
     recuadro = pygame.Rect(0,0,800,60)
     pygame.draw.rect(screen, WHITE, recuadro)
@@ -356,19 +250,7 @@ def limpiarTam():
     pygame.draw.rect(screen, WHITE, recuadro)
     pygame.display.update()
 
-# Resalta las opcion del menu principal (2x2 4x4 6x6)
-def isOverFigura(x,y,opciones,nFig):
-    for op in opciones:
-        if op['rec'].collidepoint(x,y) and not(op['selected']):
-            # Limpia la opcion seleccionada anteriormente
-            updateSelect(opciones)
-            op['selected'] = True
-            # Repintar Recuadro de figuras
-            limpiarFiguras()
-            cargarFiguras(nFig)
-            pygame.draw.rect(screen, BLUE, op['rec'], 3)
-            pygame.display.update()
-            break;
+
 
 def isOverPanelEstado(x,y,opciones,nTipoEstado):
     for op in opciones:
@@ -406,18 +288,6 @@ def isOverTam(x,y,opciones,nTam):
             pygame.display.update()
             break;
 
-def isSelectFigura(click,x,y,opciones,nfig):
-    if click:
-        fig=0
-        for op in opciones:
-            if op['rec'].collidepoint(x,y):
-                limpiarFiguras()
-                cargarFiguras(fig)
-                pygame.draw.rect(screen, BLUE, op['rec'], 3)
-                pygame.display.update()
-                return fig
-            fig+=1
-    return nfig
 
 def isSelectPanelEstado(click,x,y,opciones,nTipoEstado):
     if click:
@@ -489,9 +359,7 @@ def pintarFigura(x,y,nfig,nColor,nTam):
     if(nfig==2):
         Elipse(x,y,color,False,nTam)
 
-            
-
-
+        
 
 def main():
     pygame.init()
@@ -505,10 +373,10 @@ def main():
     clock = pygame.time.Clock()
     time = clock.tick(100000)
     
-    #nFig=0 #Determina la figura Actual
+   
     nColor=0 #Determina el color Actual
     nTam=0
-    #figuras = cargarFiguras(nFig)
+    
     colores = cargarColores(nColor)
     tams    = cargarTam(nTam)
     
@@ -542,15 +410,15 @@ def main():
                 mousex, mousey = event.pos
                 clicked = True
                 
-            #isOverFigura(mousex,mousey,figuras,nFig)
+           
             isOverPanelEstado(mousex,mousey,tipoEstados,nTipoEstado)
             isOverColores(mousex,mousey,colores,nColor)
             isOverTam(mousex,mousey,tams,nTam)
-            #nFig   = isSelectFigura(clicked,mousex,mousey,figuras,nFig)
+            
             nTipoEstado = isSelectPanelEstado(clicked,mousex,mousey,tipoEstados,nTipoEstado)
             nColor = isSelectColor (clicked,mousex,mousey,colores,nColor)
             nTam   = isSelectTam (clicked,mousex,mousey,tams,nTam)
-            #isClickedGrid(clicked,mousex,mousey,nFig,nColor,nTam)
+            
             estado = isClickedGrid(clicked,mousex,mousey,estado,nTipoEstado)
 
             pygame.display.flip()
