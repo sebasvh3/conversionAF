@@ -36,71 +36,7 @@ GRID = pygame.Rect(80,80,640,450)
 COLORES = (GREEN,BLUE,RED,YELLOW)
 
 
-def dibEstado(x,y,estado,aceptacion=0):
-    tam = 40
-    rec = pygame.Rect(0,0,tam,tam)
-    rec.centerx=x
-    rec.centery=y
-    
-    
-    pygame.draw.ellipse(screen, BLACK, rec, 1) #borde
-    
-    text = "q"+str(estado)
-    fuente = pygame.font.Font(None, 18)
-    msj = fuente.render(text, 1, BLACK)
-    msjpos = msj.get_rect()
-    msjpos.centerx = x
-    msjpos.centery = y
-    screen.blit(msj, msjpos)
-    
-    if estado == 0:
-        pygame.draw.polygon(screen, BLACK, [[x-27, y-8], [x-27, y+8], [x-20,y]])
-        
-    if aceptacion == 1:
-        rec2 = pygame.Rect(0,0,35,35)
-        rec2.centerx=x
-        rec2.centery=y
-        pygame.draw.ellipse(screen, BLACK, rec2, 1) #borde
-    
-    arrayEstados.append({'rec':rec,'nestado':estado,'aceptacion':aceptacion})    
-    
-def dibEstadoExistente(est,op=0):
-    if op==0:#Opcion de Seleccion
-        color=BLUE2
-        selArista.append(est)
-    elif op==1:#Esta opcion permite deseleccionar y organizar aristas
-        color=WHITE
-    
-    pygame.draw.ellipse(screen, color, est['rec']) #borde
-    pygame.draw.ellipse(screen, BLACK, est['rec'], 1) #borde
-    
-    text = "q"+str(est['nestado'])
-    fuente = pygame.font.Font(None, 18)
-    msj = fuente.render(text, 1, BLACK)
-    msjpos = msj.get_rect()
-    msjpos.centerx = est['rec'].centerx
-    msjpos.centery = est['rec'].centery
-    screen.blit(msj, msjpos)
-    
-    if est['aceptacion']:
-        rec2 = pygame.Rect(0,0,35,35)
-        rec2.centerx=est['rec'].centerx
-        rec2.centery=est['rec'].centery
-        pygame.draw.ellipse(screen, BLACK, rec2, 1) #borde
 
-def dibujarArista(estFin):
-    estIni = selArista[0]
-    
-    xIni = estIni['rec'].centerx
-    yIni = estIni['rec'].centery
-    
-    xFin = estFin['rec'].centerx
-    yFin = estFin['rec'].centery
-    
-    pygame.draw.line(screen, BLACK, [xIni, yIni], [xFin,yFin], 2)
-    dibEstadoExistente(estIni,1)
-    dibEstadoExistente(estFin,1)
-    del selArista[:]
         
         
 def cargarPanelEstados(estado):
@@ -333,6 +269,82 @@ def isSelectTam(click,x,y,opciones,nTam):
     return nTam
 
 
+def dibEstado(x,y,estado,aceptacion=0):
+    tam = 40
+    rec = pygame.Rect(0,0,tam,tam)
+    rec.centerx=x
+    rec.centery=y
+    
+    
+    pygame.draw.ellipse(screen, BLACK, rec, 1) #borde
+    
+    text = "q"+str(estado)
+    fuente = pygame.font.Font(None, 18)
+    msj = fuente.render(text, 1, BLACK)
+    msjpos = msj.get_rect()
+    msjpos.centerx = x
+    msjpos.centery = y
+    screen.blit(msj, msjpos)
+    
+    if estado == 0:
+        pygame.draw.polygon(screen, BLACK, [[x-27, y-8], [x-27, y+8], [x-20,y]])
+        
+    if aceptacion == 1:
+        rec2 = pygame.Rect(0,0,35,35)
+        rec2.centerx=x
+        rec2.centery=y
+        pygame.draw.ellipse(screen, BLACK, rec2, 1) #borde
+    
+    arrayEstados.append({'rec':rec,'nestado':estado,'aceptacion':aceptacion})    
+    
+def dibEstadoExistente(est,op=0):
+    if op==0:#Opcion de Seleccion
+        color=BLUE2
+        selArista.append(est)
+    elif op==1:#Esta opcion permite deseleccionar y organizar aristas
+        color=WHITE
+    
+    pygame.draw.ellipse(screen, color, est['rec']) #borde
+    pygame.draw.ellipse(screen, BLACK, est['rec'], 1) #borde
+    
+    text = "q"+str(est['nestado'])
+    fuente = pygame.font.Font(None, 18)
+    msj = fuente.render(text, 1, BLACK)
+    msjpos = msj.get_rect()
+    msjpos.centerx = est['rec'].centerx
+    msjpos.centery = est['rec'].centery
+    screen.blit(msj, msjpos)
+    
+    if est['aceptacion']:
+        rec2 = pygame.Rect(0,0,35,35)
+        rec2.centerx=est['rec'].centerx
+        rec2.centery=est['rec'].centery
+        pygame.draw.ellipse(screen, BLACK, rec2, 1) #borde
+
+def dibujarArista(estFin):
+    estIni = selArista[0]
+    
+    if estIni['nestado'] == estFin['nestado']:
+        rec = pygame.Rect(0,0,28,55)
+        rec.centerx = estIni['rec'].centerx
+        rec.centery=  estIni['rec'].centery - 15
+        pygame.draw.ellipse(screen, BLACK, rec, 2) #borde
+        dibEstadoExistente(estIni,1)
+    else:
+        xIni = estIni['rec'].centerx
+        yIni = estIni['rec'].centery
+
+        xFin = estFin['rec'].centerx
+        yFin = estFin['rec'].centery
+
+        pygame.draw.line(screen, BLACK, [xIni, yIni], [xFin,yFin], 2)
+        dibEstadoExistente(estIni,1)
+        dibEstadoExistente(estFin,1)
+    
+    del selArista[:]
+
+
+
 #def isClickedGrid(click,x,y,nfig,nColor,nTam):
 def isClickedGrid(click,x,y,estado,nTipoEstado):
     if click:
@@ -374,11 +386,11 @@ def main():
     time = clock.tick(100000)
     
    
-    nColor=0 #Determina el color Actual
-    nTam=0
+#    nColor=0 #Determina el color Actual
+#    nTam=0
     
-    colores = cargarColores(nColor)
-    tams    = cargarTam(nTam)
+#    colores = cargarColores(nColor)
+#    tams    = cargarTam(nTam)
     
     global arrayEstados,selArista,aristas
     arrayEstados=[]
@@ -412,12 +424,12 @@ def main():
                 
            
             isOverPanelEstado(mousex,mousey,tipoEstados,nTipoEstado)
-            isOverColores(mousex,mousey,colores,nColor)
-            isOverTam(mousex,mousey,tams,nTam)
+#            isOverColores(mousex,mousey,colores,nColor)
+#            isOverTam(mousex,mousey,tams,nTam)
             
             nTipoEstado = isSelectPanelEstado(clicked,mousex,mousey,tipoEstados,nTipoEstado)
-            nColor = isSelectColor (clicked,mousex,mousey,colores,nColor)
-            nTam   = isSelectTam (clicked,mousex,mousey,tams,nTam)
+#            nColor = isSelectColor (clicked,mousex,mousey,colores,nColor)
+#            nTam   = isSelectTam (clicked,mousex,mousey,tams,nTam)
             
             estado = isClickedGrid(clicked,mousex,mousey,estado,nTipoEstado)
 
