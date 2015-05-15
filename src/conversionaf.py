@@ -92,23 +92,43 @@ def dibEstado(x,y,estado,aceptacion=0):
     
     arrayEstados.append({'rec':rec,'nestado':estado,'aceptacion':aceptacion})    
     
-def dibEstadoExistente(infoEstado):
-    pygame.draw.ellipse(screen, BLUE2, infoEstado['rec']) #borde
-    pygame.draw.ellipse(screen, BLACK, infoEstado['rec'], 1) #borde
+def dibEstadoExistente(est,op=0):
+    if op==0:#Opcion de Seleccion
+        color=BLUE2
+        selArista.append(est)
+    elif op==1:#Esta opcion permite deseleccionar y organizar aristas
+        color=WHITE
     
-    text = "q"+str(infoEstado['nestado'])
+    pygame.draw.ellipse(screen, color, est['rec']) #borde
+    pygame.draw.ellipse(screen, BLACK, est['rec'], 1) #borde
+    
+    text = "q"+str(est['nestado'])
     fuente = pygame.font.Font(None, 18)
     msj = fuente.render(text, 1, BLACK)
     msjpos = msj.get_rect()
-    msjpos.centerx = infoEstado['rec'].centerx
-    msjpos.centery = infoEstado['rec'].centery
+    msjpos.centerx = est['rec'].centerx
+    msjpos.centery = est['rec'].centery
     screen.blit(msj, msjpos)
     
-    if infoEstado['aceptacion']:
+    if est['aceptacion']:
         rec2 = pygame.Rect(0,0,35,35)
-        rec2.centerx=infoEstado['rec'].centerx
-        rec2.centery=infoEstado['rec'].centery
+        rec2.centerx=est['rec'].centerx
+        rec2.centery=est['rec'].centery
         pygame.draw.ellipse(screen, BLACK, rec2, 1) #borde
+
+def dibujarArista(estFin):
+    estIni = selArista[0]
+    
+    xIni = estIni['rec'].centerx
+    yIni = estIni['rec'].centery
+    
+    xFin = estFin['rec'].centerx
+    yFin = estFin['rec'].centery
+    
+    pygame.draw.line(screen, BLACK, [xIni, yIni], [xFin,yFin], 2)
+    dibEstadoExistente(estIni,1)
+    dibEstadoExistente(estFin,1)
+    del selArista[:]
         
         
 def cargarPanelEstados(estado):
@@ -451,7 +471,10 @@ def isClickedGrid(click,x,y,estado,nTipoEstado):
             #Revisa si es sobre un estado ya creado
             for est in arrayEstados:
                 if est['rec'].collidepoint(x,y):
-                    dibEstadoExistente(est)
+                    if len(selArista):
+                        dibujarArista(est)
+                    else:
+                        dibEstadoExistente(est)
                     return estado
             dibEstado(x,y,estado,nTipoEstado)
             return estado+1
@@ -489,8 +512,12 @@ def main():
     colores = cargarColores(nColor)
     tams    = cargarTam(nTam)
     
-    global arrayEstados
+    global arrayEstados,selArista,aristas
     arrayEstados=[]
+    selArista=[]
+    aristas=[]
+    
+    
     
     nTipoEstado = 0
     tipoEstados = cargarPanelEstados(nTipoEstado)
@@ -498,8 +525,6 @@ def main():
     
     
     #print figuras
-    print colores
-    print tams
 
     pygame.draw.rect(screen, BLACK, GRID,1)
     pygame.display.flip()
