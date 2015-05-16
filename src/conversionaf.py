@@ -119,56 +119,74 @@ def cargarColores(nColor):
     rColores = []
     i=0
     for color in COLORES:
-        recuadro = pygame.Rect(0,0,aR,aR)
-        recuadro.centerx = xIni
-        recuadro.centery = yIni
+        recExt = pygame.Rect(0,0,aR,aR)
+        recExt.centerx = xIni
+        recExt.centery = yIni
         #rColores.append(recuadro)
-        rColores.append({'rec':recuadro,'selected':False})
+        rColores.append({'rec':recExt,'selected':False})
         
-        pygame.draw.rect(screen, BLACK, recuadro,1)
-        cuadroColor = pygame.Rect(0,0,aI,aI)
-        cuadroColor.centerx = xIni
-        cuadroColor.centery = yIni
+        pygame.draw.rect(screen, BLACK, recExt,1)
+        recInt = pygame.Rect(0,0,aI,aI)
+        recInt.centerx = xIni
+        recInt.centery = yIni
         if nColor == i:
-            pygame.draw.rect(screen, color, recuadro)
-            pygame.draw.rect(screen, BLACK, recuadro,1)
+            pygame.draw.rect(screen, color, recExt)
+            pygame.draw.rect(screen, BLACK, recExt,1)
         else:    
-            pygame.draw.rect(screen, color, cuadroColor)
-            pygame.draw.rect(screen, BLACK, cuadroColor,1)
+            pygame.draw.rect(screen, color, recInt)
+            pygame.draw.rect(screen, BLACK, recInt,1)
         xIni+=dis
         i+=1
     pygame.display.update()
     return rColores
 
 
-def cargarTam(nTam):
-    aR=33 # Ancho Recuadro
-    aI=8 # Ancho Imagen
-    xIni=20 # Posicion x Inicial donde empieza a impantar
+def cargarAlfabeto(nSimbolo):
+    aR=40 # Ancho Recuadro
+    aI=22 # Ancho Imagen
+    xIni=30 # Posicion x Inicial donde empieza a impantar
     yIni=100 # Posicion y Inicial donde empieza a impantar
-    dis = 40 # Distancia entre cada recuadro
+    dis = 42 # Distancia entre cada recuadro
     
-    rTams = []
+    recSimbolos = []
     i=0
-    for t in range(1,4):
-        recuadro = pygame.Rect(0,0,aR,aR)
-        recuadro.centerx = xIni
-        recuadro.centery = yIni
-        rTams.append(recuadro)
-        pygame.draw.rect(screen, BLACK, recuadro,1)
+    
+    alfabeto = ['a','b','c']
+    
+    for s in alfabeto:
+        recExt = pygame.Rect(0,0,aR,aR)
+        recExt.centerx = xIni
+        recExt.centery = yIni
         
-        cuadro = pygame.Rect(0,0,t*aI,t*aI)
-        cuadro.centerx = xIni
-        cuadro.centery = yIni
-        if nTam == i:
-            pygame.draw.rect(screen, BLUE, cuadro)
-            pygame.draw.rect(screen, BLACK, cuadro,1)
-        else:    
-            pygame.draw.rect(screen, BLACK, cuadro,1)
+        recSimbolos.append({'rec':recExt,'selected':False})
+        if(nSimbolo == i):
+            pygame.draw.rect(screen, BLUE2, recExt)
+        pygame.draw.rect(screen, BLACK, recExt,1)
+        
+        
+        recInt = pygame.Rect(0,0,aI,aI)
+        recInt.centerx = xIni
+        recInt.centery = yIni
+        pygame.draw.rect(screen, WHITE, recInt)
+        pygame.draw.rect(screen, BLACK, recInt, 1)
+        
+        
+        fuente = pygame.font.Font(None, 18)
+        sim = fuente.render(s, 1, BLACK)
+        simPos = sim.get_rect()
+        simPos.centerx = xIni
+        simPos.centery = yIni
+        screen.blit(sim, simPos)
+        
+#        if nTam == i:
+#            pygame.draw.rect(screen, BLUE, recInt)
+#            pygame.draw.rect(screen, BLACK, recInt,1)
+#        else:    
+#            pygame.draw.rect(screen, BLACK, recInt,1)
         yIni+=dis
         i+=1
     pygame.display.update()
-    return rTams
+    return recSimbolos
 
 
 def limpiarPanelEstados():
@@ -181,7 +199,7 @@ def limpiarColores():
     pygame.draw.rect(screen, WHITE, recuadro)
     pygame.display.update()
 
-def limpiarTam():
+def limpiarAlfabeto():
     recuadro = pygame.Rect(0,70,80,300)
     pygame.draw.rect(screen, WHITE, recuadro)
     pygame.display.update()
@@ -206,8 +224,8 @@ def isOverColores(x,y,opciones,nColor):
     for op in opciones:
         if op['rec'].collidepoint(x,y) and not(op['selected']):
             # Limpia la opcion seleccionada anteriormente
-            updateSelect(opciones)
             op['selected'] = True
+            updateSelect(opciones)
             # Repintar Recuadro de figuras
             limpiarColores()
             cargarColores(nColor)
@@ -215,12 +233,16 @@ def isOverColores(x,y,opciones,nColor):
             pygame.display.update()
             break;
 
-def isOverTam(x,y,opciones,nTam):
+def isOverAlfabeto(x,y,opciones,nSimbolo):
     for op in opciones:
-        if op.collidepoint(x,y):
-            limpiarTam()
-            cargarTam(nTam)
-            pygame.draw.rect(screen, BLUE, op, 3)
+        if op['rec'].collidepoint(x,y) and not(op['selected']):
+            # Limpia la opcion seleccionada anteriormente
+            updateSelect(opciones)
+            op['selected'] = True
+            
+            limpiarAlfabeto()
+            cargarAlfabeto(nSimbolo)
+            pygame.draw.rect(screen, BLUE, op['rec'], 3)
             pygame.display.update()
             break;
 
@@ -255,18 +277,18 @@ def isSelectColor(click,x,y,opciones,nColor):
             color+=1
     return nColor
 
-def isSelectTam(click,x,y,opciones,nTam):
+def isSelectAlfabeto(click,x,y,opciones,nSimbolo):
     if click:
-        tam=0
+        sim=0
         for op in opciones:
-            if op.collidepoint(x,y):
-                limpiarTam()
-                cargarTam(tam)
-                pygame.draw.rect(screen, BLUE, op, 3)
+            if op['rec'].collidepoint(x,y):
+                limpiarAlfabeto()
+                cargarAlfabeto(sim)
+                pygame.draw.rect(screen, BLUE, op['rec'], 3)
                 pygame.display.update()
-                return tam
-            tam+=1
-    return nTam
+                return sim
+            sim+=1
+    return nSimbolo
 
 
 def dibEstado(x,y,estado,aceptacion=0):
@@ -403,6 +425,9 @@ def main():
     tipoEstados = cargarPanelEstados(nTipoEstado)
     estado=0
     
+    nSimbolo = 0
+    simbolos = cargarAlfabeto(nSimbolo);
+    
     
     #print figuras
 
@@ -424,11 +449,11 @@ def main():
                 
            
             isOverPanelEstado(mousex,mousey,tipoEstados,nTipoEstado)
-#            isOverColores(mousex,mousey,colores,nColor)
+            isOverAlfabeto(mousex,mousey,simbolos,nSimbolo)
 #            isOverTam(mousex,mousey,tams,nTam)
             
             nTipoEstado = isSelectPanelEstado(clicked,mousex,mousey,tipoEstados,nTipoEstado)
-#            nColor = isSelectColor (clicked,mousex,mousey,colores,nColor)
+            nSimbolo = isSelectAlfabeto(clicked,mousex,mousey,simbolos,nSimbolo)
 #            nTam   = isSelectTam (clicked,mousex,mousey,tams,nTam)
             
             estado = isClickedGrid(clicked,mousex,mousey,estado,nTipoEstado)
