@@ -321,7 +321,7 @@ def dibEstado(x,y,estado,aceptacion=0):
     
 def dibEstadoExistente(est,op=0):
     if op==0:#Opcion de Seleccion
-        color=BLUE2
+        color=YELLOW
         selArista.append(est)
     elif op==1:#Esta opcion permite deseleccionar y organizar aristas
         color=WHITE
@@ -343,7 +343,8 @@ def dibEstadoExistente(est,op=0):
         rec2.centery=est['rec'].centery
         pygame.draw.ellipse(screen, BLACK, rec2, 1) #borde
 
-def dibujarArista(estFin):
+def dibujarArista(estFin,nSimbolo):
+    alfabeto = ['a','b','c']
     estIni = selArista[0]
     
     if estIni['nestado'] == estFin['nestado']:
@@ -359,16 +360,34 @@ def dibujarArista(estFin):
         xFin = estFin['rec'].centerx
         yFin = estFin['rec'].centery
 
-        pygame.draw.line(screen, BLACK, [xIni, yIni], [xFin,yFin], 2)
+        recLine = pygame.draw.line(screen, BLACK, [xIni, yIni], [xFin,yFin], 2)
+        
+        #Simbolo Alfabeto
+        
+        recW = pygame.Rect(0,0,10,10)
+        recW.centerx=recLine.centerx
+        recW.centery=recLine.centery
+        pygame.draw.rect(screen, WHITE, recW)
+        
+        printText(recLine.centerx,recLine.centery,alfabeto[nSimbolo])
+        
         dibEstadoExistente(estIni,1)
         dibEstadoExistente(estFin,1)
     
     del selArista[:]
 
 
+def printText(x,y,text,tam=18):
+    fuente = pygame.font.Font(None,tam)
+    msg = fuente.render(text, 1, BLACK)
+    msgRect = msg.get_rect()
+    msgRect.centerx = x
+    msgRect.centery = y
+    screen.blit(msg, msgRect)
+
 
 #def isClickedGrid(click,x,y,nfig,nColor,nTam):
-def isClickedGrid(click,x,y,estado,nTipoEstado):
+def isClickedGrid(click,x,y,estado,nTipoEstado,nSimbolo):
     if click:
         if GRID.collidepoint(x,y):
             #pintarFigura(x,y,nfig,nColor,nTam)
@@ -376,7 +395,7 @@ def isClickedGrid(click,x,y,estado,nTipoEstado):
             for est in arrayEstados:
                 if est['rec'].collidepoint(x,y):
                     if len(selArista):
-                        dibujarArista(est)
+                        dibujarArista(est,nSimbolo)
                     else:
                         dibEstadoExistente(est)
                     return estado
@@ -428,8 +447,11 @@ def main():
     nSimbolo = 0
     simbolos = cargarAlfabeto(nSimbolo);
     
+
+    #Test Function 
+#    print (pygame.math.Vector2.distance_to((5,5)))
     
-    #print figuras
+    #End - test Function 
 
     pygame.draw.rect(screen, BLACK, GRID,1)
     pygame.display.flip()
@@ -456,7 +478,7 @@ def main():
             nSimbolo = isSelectAlfabeto(clicked,mousex,mousey,simbolos,nSimbolo)
 #            nTam   = isSelectTam (clicked,mousex,mousey,tams,nTam)
             
-            estado = isClickedGrid(clicked,mousex,mousey,estado,nTipoEstado)
+            estado = isClickedGrid(clicked,mousex,mousey,estado,nTipoEstado,nSimbolo)
 
             pygame.display.flip()
                          
