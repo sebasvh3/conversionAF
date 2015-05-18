@@ -353,6 +353,7 @@ def dibujarArista(estFin,nSimbolo):
         rec.centery=  estIni['rec'].centery - 15
         pygame.draw.ellipse(screen, BLACK, rec, 2) #borde
         dibEstadoExistente(estIni,1)
+        printText(estIni['rec'].centerx,estIni['rec'].centery - 47,alfabeto[nSimbolo])
     else:
         xIni = estIni['rec'].centerx
         yIni = estIni['rec'].centery
@@ -364,11 +365,10 @@ def dibujarArista(estFin,nSimbolo):
         
         #Simbolo Alfabeto
         
-        recW = pygame.Rect(0,0,10,10)
+        recW = pygame.Rect(0,0,12,12)
         recW.centerx=recLine.centerx
         recW.centery=recLine.centery
         pygame.draw.rect(screen, WHITE, recW)
-        
         printText(recLine.centerx,recLine.centery,alfabeto[nSimbolo])
         
         dibEstadoExistente(estIni,1)
