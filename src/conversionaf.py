@@ -13,6 +13,7 @@ from pygame.locals import *
 import sys
 import os
 import time
+import math
 
 
 PantX = 800
@@ -361,7 +362,12 @@ def dibujarArista(estFin,nSimbolo):
         xFin = estFin['rec'].centerx
         yFin = estFin['rec'].centery
 
+        #Line
         recLine = pygame.draw.line(screen, BLACK, [xIni, yIni], [xFin,yFin], 2)
+        #Head
+        getHeadArrow(xIni,yIni,xFin,yFin)
+        
+#        pygame.draw.rect(screen,BLUE,recLine,1)
         
         #Simbolo Alfabeto
         
@@ -384,13 +390,56 @@ def printText(x,y,text,tam=18):
     msgRect.centerx = x
     msgRect.centery = y
     screen.blit(msg, msgRect)
+    
+def printPoint(x,y):
+    rect = pygame.Rect(0,0,8,8)
+    rect.centerx=x
+    rect.centery=y
+    pygame.draw.ellipse(screen, RED, rect)
+    
+
+def getRecta(x1,y1,x2,y2):
+    m = (y1-y2)*1.0/(x1-x2)
+    b = y1-m*x1
+    return (m,b)
+
+def evalRecta(recta,x):
+    return recta[0]*x+recta[1]
+    
+def getXYDist(a,b,d,recta,r=1):
+    m = recta[0]
+    c = recta[1]-b
+    
+    A = m*m+1
+    B = 2*c*m-2*a
+    C = a*a+c*c-d*d
+    
+    x = (-B+r*math.sqrt(B*B-4*A*C))/(2*A)
+    y = evalRecta(recta,x)
+    return (x,y)
+
+def getHeadArrow(x1,y1,x2,y2):
+    recta = getRecta(x1,y1,x2,y2)
+    r = (1,-1)[x1<x2]
+    p1 = getXYDist(x2,y2,20,recta,r)
+    
+    pt = getXYDist(x2,y2,25,recta,r)
+    #Recta Perpendicular
+    m2 = -1/recta[0]
+    b2 = pt[1]- m2*pt[0]
+    
+    p2 = getXYDist(pt[0], pt[1], 5, (m2,b2), 1)
+    p3 = getXYDist(pt[0], pt[1], 5, (m2,b2), -1)
+
+    pygame.draw.polygon(screen, BLACK, [p1, p2, p3])
+
+    
 
 
 #def isClickedGrid(click,x,y,nfig,nColor,nTam):
 def isClickedGrid(click,x,y,estado,nTipoEstado,nSimbolo):
     if click:
         if GRID.collidepoint(x,y):
-            #pintarFigura(x,y,nfig,nColor,nTam)
             #Revisa si es sobre un estado ya creado
             for est in arrayEstados:
                 if est['rec'].collidepoint(x,y):
@@ -402,18 +451,7 @@ def isClickedGrid(click,x,y,estado,nTipoEstado,nSimbolo):
             dibEstado(x,y,estado,nTipoEstado)
             return estado+1
     return estado
-
-def pintarFigura(x,y,nfig,nColor,nTam):
-    color = COLORES[nColor]
-    if(nfig==0):
-        Rectangulo(x,y,color,nTam)
-    if(nfig==1):
-        Elipse(x,y,color,True,nTam)
-    if(nfig==2):
-        Elipse(x,y,color,False,nTam)
-
         
-
 def main():
     pygame.init()
     # Num = 2,4,6
@@ -450,6 +488,13 @@ def main():
 
     #Test Function 
 #    print (pygame.math.Vector2.distance_to((5,5)))
+    x1,y1 = 100,100
+    x2,y2 = 200,150
+    
+  
+    
+#    recLine = pygame.draw.line(screen, BLACK, [x1,y1], [x2,y2], 2)
+#    getHeadArrow(x1,y1,x2,y2)
     
     #End - test Function 
 
