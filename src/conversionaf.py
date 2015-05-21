@@ -468,7 +468,6 @@ def main():
     Aristas=[]
     Alfabeto = ['a','b','c']        
 
-    Num = []
     
     nTipoEstado = 0
     tipoEstados = cargarPanelEstados(nTipoEstado)
