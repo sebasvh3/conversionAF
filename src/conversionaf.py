@@ -69,12 +69,7 @@ def cargarPanelEstados(estado):
     
     #fuente
     text = "qn"
-    fuente = pygame.font.Font(None, 18)
-    mensaje = fuente.render(text, 1, BLACK)
-    msjpos = mensaje.get_rect()
-    msjpos.centerx = xIni
-    msjpos.centery = yIni
-    screen.blit(mensaje, msjpos)
+    printText(xIni,yIni,text)
     
     
     #Estado que es de aceptacion
@@ -101,45 +96,42 @@ def cargarPanelEstados(estado):
     pygame.draw.ellipse(screen, BLACK, circulo3, 1) #borde
     
     #fuente
-    msjpos.centerx = xIni+dis
-    msjpos.centery = yIni
-    screen.blit(mensaje, msjpos)
+    printText(xIni+dis,yIni,text)
     
     
     pygame.display.update()
     return figuras
     
 
-def cargarColores(nColor):
+def cargarAcciones(nAccion):
     aR=33 # Ancho Recuadro
     aI=20 # Ancho Imagen
     xIni=80 # Posicion x Inicial donde empieza a impantar
     yIni=560 # Posicion y Inicial donde empieza a impantar
     dis = 40 # Distancia entre cada recuadro
     
-    rColores = []
-    i=0
-    for color in COLORES:
-        recExt = pygame.Rect(0,0,aR,aR)
-        recExt.centerx = xIni
-        recExt.centery = yIni
-        #rColores.append(recuadro)
-        rColores.append({'rec':recExt,'selected':False})
-        
-        pygame.draw.rect(screen, BLACK, recExt,1)
-        recInt = pygame.Rect(0,0,aI,aI)
-        recInt.centerx = xIni
-        recInt.centery = yIni
-        if nColor == i:
-            pygame.draw.rect(screen, color, recExt)
-            pygame.draw.rect(screen, BLACK, recExt,1)
-        else:    
-            pygame.draw.rect(screen, color, recInt)
-            pygame.draw.rect(screen, BLACK, recInt,1)
-        xIni+=dis
-        i+=1
-    pygame.display.update()
-    return rColores
+    acciones = []
+    
+    #Ejecutar Expresion Regular
+    recuadro1 = pygame.Rect(0,0,aR,aR)
+    recuadro1.centerx=xIni
+    recuadro1.centery=yIni
+    acciones.append({'rec':recuadro1,'selected':False})
+    
+    if(nAccion == 0):
+        pygame.draw.rect(screen, BLUE2, recuadro1)
+    pygame.draw.rect(screen, BLACK, recuadro1,1)
+
+    recInt = pygame.Rect(0,0,aI,aI)
+    recInt.centerx = xIni
+    recInt.centery = yIni
+    pygame.draw.rect(screen, WHITE, recInt)
+    pygame.draw.rect(screen, BLACK, recInt, 1)
+
+    pygame.draw.polygon(screen, GREEN, [[xIni-6, yIni-6], [xIni-6, yIni+6], [xIni+5,yIni]])
+    pygame.draw.polygon(screen, BLACK, [[xIni-6, yIni-6], [xIni-6, yIni+6], [xIni+5,yIni]], 1)
+
+    return acciones
 
 
 def cargarAlfabeto(nSimbolo):
@@ -152,9 +144,9 @@ def cargarAlfabeto(nSimbolo):
     recSimbolos = []
     i=0
     
-    alfabeto = ['a','b','c']
+    #alfabeto = ['a','b','c']
     
-    for s in alfabeto:
+    for s in Alfabeto:
         recExt = pygame.Rect(0,0,aR,aR)
         recExt.centerx = xIni
         recExt.centery = yIni
@@ -171,19 +163,8 @@ def cargarAlfabeto(nSimbolo):
         pygame.draw.rect(screen, WHITE, recInt)
         pygame.draw.rect(screen, BLACK, recInt, 1)
         
-        
-        fuente = pygame.font.Font(None, 18)
-        sim = fuente.render(s, 1, BLACK)
-        simPos = sim.get_rect()
-        simPos.centerx = xIni
-        simPos.centery = yIni
-        screen.blit(sim, simPos)
-        
-#        if nTam == i:
-#            pygame.draw.rect(screen, BLUE, recInt)
-#            pygame.draw.rect(screen, BLACK, recInt,1)
-#        else:    
-#            pygame.draw.rect(screen, BLACK, recInt,1)
+        printText(xIni,yIni,s)
+
         yIni+=dis
         i+=1
     pygame.display.update()
@@ -195,7 +176,7 @@ def limpiarPanelEstados():
     pygame.draw.rect(screen, WHITE, recuadro)
     pygame.display.update()
 
-def limpiarColores():
+def limpiarAcciones():
     recuadro = pygame.Rect(0,540,800,60)
     pygame.draw.rect(screen, WHITE, recuadro)
     pygame.display.update()
@@ -221,18 +202,23 @@ def isOverPanelEstado(x,y,opciones,nTipoEstado):
             break;
             
 # Resalta las opcion del menu principal (2x2 4x4 6x6)
-def isOverColores(x,y,opciones,nColor):
+def isOverAccion(x,y,opciones,nAccion):
     for op in opciones:
         if op['rec'].collidepoint(x,y) and not(op['selected']):
             # Limpia la opcion seleccionada anteriormente
-            op['selected'] = True
             updateSelect(opciones)
+            op['selected'] = True
             # Repintar Recuadro de figuras
-            limpiarColores()
-            cargarColores(nColor)
+            limpiarAcciones()
+            cargarAcciones(nAccion)
             pygame.draw.rect(screen, BLUE, op['rec'], 3)
             pygame.display.update()
+            #print "isoverAccion"
             break;
+
+#global num
+
+
 
 def isOverAlfabeto(x,y,opciones,nSimbolo):
     for op in opciones:
@@ -265,18 +251,19 @@ def updateSelect(opciones):
     for op in opciones:
         op['selected'] = False
 
-def isSelectColor(click,x,y,opciones,nColor):
+def isSelectAccion(click,x,y,opciones,nAccion):
     if click:
-        color=0
+        accion=0
         for op in opciones:
             if op['rec'].collidepoint(x,y):
-                limpiarColores()
-                cargarColores(color)
-                pygame.draw.rect(screen, BLUE, op['rec'], 3)
+                limpiarAcciones()
+                cargarAcciones(accion)
+                pygame.draw.rect(screen, GREEN, op['rec'], 3)
                 pygame.display.update()
-                return color
-            color+=1
-    return nColor
+                print calcularRegExp(0)
+                return accion
+            accion+=1
+    return nAccion
 
 def isSelectAlfabeto(click,x,y,opciones,nSimbolo):
     if click:
@@ -298,27 +285,25 @@ def dibEstado(x,y,estado,aceptacion=0):
     rec.centerx=x
     rec.centery=y
     
-    
     pygame.draw.ellipse(screen, BLACK, rec, 1) #borde
     
     text = "q"+str(estado)
-    fuente = pygame.font.Font(None, 18)
-    msj = fuente.render(text, 1, BLACK)
-    msjpos = msj.get_rect()
-    msjpos.centerx = x
-    msjpos.centery = y
-    screen.blit(msj, msjpos)
+    printText(x,y,text)
     
+    #Estado Inicial
     if estado == 0:
         pygame.draw.polygon(screen, BLACK, [[x-27, y-8], [x-27, y+8], [x-20,y]])
-        
+    
+    #Estado(s) de Aceptación
     if aceptacion == 1:
         rec2 = pygame.Rect(0,0,35,35)
         rec2.centerx=x
         rec2.centery=y
         pygame.draw.ellipse(screen, BLACK, rec2, 1) #borde
     
-    arrayEstados.append({'rec':rec,'nestado':estado,'aceptacion':aceptacion})    
+    #Estructura arrayEstados['aristas'] --> []
+    #{'sig':nEstadoSig,'sim':simbolo}
+    arrayEstados.append({'rec':rec,'nestado':estado,'aceptacion':aceptacion,'aristas': []})
     
 def dibEstadoExistente(est,op=0):
     if op==0:#Opcion de Seleccion
@@ -331,12 +316,7 @@ def dibEstadoExistente(est,op=0):
     pygame.draw.ellipse(screen, BLACK, est['rec'], 1) #borde
     
     text = "q"+str(est['nestado'])
-    fuente = pygame.font.Font(None, 18)
-    msj = fuente.render(text, 1, BLACK)
-    msjpos = msj.get_rect()
-    msjpos.centerx = est['rec'].centerx
-    msjpos.centery = est['rec'].centery
-    screen.blit(msj, msjpos)
+    printText(est['rec'].centerx,est['rec'].centery,text)
     
     if est['aceptacion']:
         rec2 = pygame.Rect(0,0,35,35)
@@ -345,7 +325,6 @@ def dibEstadoExistente(est,op=0):
         pygame.draw.ellipse(screen, BLACK, rec2, 1) #borde
 
 def dibujarArista(estFin,nSimbolo):
-    alfabeto = ['a','b','c']
     estIni = selArista[0]
     
     if estIni['nestado'] == estFin['nestado']:
@@ -354,7 +333,7 @@ def dibujarArista(estFin,nSimbolo):
         rec.centery=  estIni['rec'].centery - 15
         pygame.draw.ellipse(screen, BLACK, rec, 2) #borde
         dibEstadoExistente(estIni,1)
-        printText(estIni['rec'].centerx,estIni['rec'].centery - 47,alfabeto[nSimbolo])
+        printText(estIni['rec'].centerx,estIni['rec'].centery - 47,Alfabeto[nSimbolo])
     else:
         xIni = estIni['rec'].centerx
         yIni = estIni['rec'].centery
@@ -363,24 +342,24 @@ def dibujarArista(estFin,nSimbolo):
         yFin = estFin['rec'].centery
 
         #Line
-        recLine = pygame.draw.line(screen, BLACK, [xIni, yIni], [xFin,yFin], 2)
+        recLine = pygame.draw.line(screen, BLACK, [xIni, yIni], [xFin,yFin], 1)
         #Head
         getHeadArrow(xIni,yIni,xFin,yFin)
-        
-#        pygame.draw.rect(screen,BLUE,recLine,1)
-        
+                
         #Simbolo Alfabeto
-        
         recW = pygame.Rect(0,0,12,12)
         recW.centerx=recLine.centerx
         recW.centery=recLine.centery
         pygame.draw.rect(screen, WHITE, recW)
-        printText(recLine.centerx,recLine.centery,alfabeto[nSimbolo])
+        printText(recLine.centerx,recLine.centery,Alfabeto[nSimbolo])
         
         dibEstadoExistente(estIni,1)
         dibEstadoExistente(estFin,1)
     
     del selArista[:]
+    #Se agrega la informacion de la arista en el estado inicial
+    estIni['aristas'].append({'sig':estFin['nestado'],'sim':nSimbolo})
+    #print(arrayEstados)
 
 
 def printText(x,y,text,tam=18):
@@ -423,13 +402,13 @@ def getHeadArrow(x1,y1,x2,y2):
     r = (1,-1)[x1<x2]
     p1 = getXYDist(x2,y2,20,recta,r)
     
-    pt = getXYDist(x2,y2,25,recta,r)
+    pt = getXYDist(x2,y2,27,recta,r)
     #Recta Perpendicular
     m2 = -1/recta[0]
     b2 = pt[1]- m2*pt[0]
     
-    p2 = getXYDist(pt[0], pt[1], 5, (m2,b2), 1)
-    p3 = getXYDist(pt[0], pt[1], 5, (m2,b2), -1)
+    p2 = getXYDist(pt[0], pt[1], 7, (m2,b2), 1)
+    p3 = getXYDist(pt[0], pt[1], 7, (m2,b2), -1)
 
     pygame.draw.polygon(screen, BLACK, [p1, p2, p3])
 
@@ -451,52 +430,55 @@ def isClickedGrid(click,x,y,estado,nTipoEstado,nSimbolo):
             dibEstado(x,y,estado,nTipoEstado)
             return estado+1
     return estado
+     
+        
+def calcularRegExp(nEstado):
+    opc = []
+    for a in arrayEstados[nEstado]['aristas']:
+        sig = a['sig']
+        sim = a['sim']
+        re = calcularRegExp(sig)
+        opc.append(Alfabeto[sim]+re)
+    
+    first = True
+    cadRex = ''
+    for op in opc:
+        if first:
+           cadRex+=op
+           first = False
+        else:
+            cadRex+=" + "+op
+    
+    return cadRex
         
 def main():
     pygame.init()
-    # Num = 2,4,6
-    
     # creamos la ventana y le indicamos un titulo:
     global screen
     screen = pygame.display.set_mode((PantX, PantY))
-    pygame.display.set_caption("Concentrese!")
+    pygame.display.set_caption("Conversión Autómata!")
     screen.fill(WHITE)
     clock = pygame.time.Clock()
     time = clock.tick(100000)
     
-   
-#    nColor=0 #Determina el color Actual
-#    nTam=0
     
-#    colores = cargarColores(nColor)
-#    tams    = cargarTam(nTam)
-    
-    global arrayEstados,selArista,aristas
+    global arrayEstados,selArista,Aristas,Alfabeto,Num
     arrayEstados=[]
     selArista=[]
-    aristas=[]
-    
-    
+    Aristas=[]
+    Alfabeto = ['a','b','c']        
+
+    Num = []
     
     nTipoEstado = 0
     tipoEstados = cargarPanelEstados(nTipoEstado)
     estado=0
     
     nSimbolo = 0
-    simbolos = cargarAlfabeto(nSimbolo);
+    simbolos = cargarAlfabeto(nSimbolo)
     
-
-    #Test Function 
-#    print (pygame.math.Vector2.distance_to((5,5)))
-    x1,y1 = 100,100
-    x2,y2 = 200,150
-    
-  
-    
-#    recLine = pygame.draw.line(screen, BLACK, [x1,y1], [x2,y2], 2)
-#    getHeadArrow(x1,y1,x2,y2)
-    
-    #End - test Function 
+    nAccion = 0
+    acciones = cargarAcciones(nAccion)
 
     pygame.draw.rect(screen, BLACK, GRID,1)
     pygame.display.flip()
@@ -517,11 +499,11 @@ def main():
            
             isOverPanelEstado(mousex,mousey,tipoEstados,nTipoEstado)
             isOverAlfabeto(mousex,mousey,simbolos,nSimbolo)
-#            isOverTam(mousex,mousey,tams,nTam)
+            isOverAccion(mousex,mousey,acciones,nAccion)
             
-            nTipoEstado = isSelectPanelEstado(clicked,mousex,mousey,tipoEstados,nTipoEstado)
-            nSimbolo = isSelectAlfabeto(clicked,mousex,mousey,simbolos,nSimbolo)
-#            nTam   = isSelectTam (clicked,mousex,mousey,tams,nTam)
+            nTipoEstado  = isSelectPanelEstado(clicked,mousex,mousey,tipoEstados,nTipoEstado)
+            nSimbolo     = isSelectAlfabeto(clicked,mousex,mousey,simbolos,nSimbolo)
+            nAccion      = isSelectAccion(clicked,mousex,mousey,acciones,nAccion)
             
             estado = isClickedGrid(clicked,mousex,mousey,estado,nTipoEstado,nSimbolo)
 
