@@ -24,6 +24,7 @@ DARKGRAY = (60, 60, 60)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
+GREEN2 = (105, 164, 117)
 BLUE = (0, 0, 255)
 BLUE2 = (124, 181, 238)
 YELLOW = (255, 255, 0)
@@ -171,13 +172,20 @@ def cargarAlfabeto(nSimbolo):
     return recSimbolos
 
 
+def cargarGridSalida(salida = True):
+    if salida:
+        printText(270,565,"Salida:",15,BLUE)
+    recSalida = pygame.Rect(296,545,425,40)    
+    pygame.draw.rect(screen,WHITE,recSalida)
+    pygame.draw.rect(screen,DARKGRAY,recSalida,1)
+
 def limpiarPanelEstados():
     recuadro = pygame.Rect(0,0,800,60)
     pygame.draw.rect(screen, WHITE, recuadro)
     pygame.display.update()
 
 def limpiarAcciones():
-    recuadro = pygame.Rect(0,540,800,60)
+    recuadro = pygame.Rect(0,540,200,60)
     pygame.draw.rect(screen, WHITE, recuadro)
     pygame.display.update()
 
@@ -260,7 +268,7 @@ def isSelectAccion(click,x,y,opciones,nAccion):
                 cargarAcciones(accion)
                 pygame.draw.rect(screen, GREEN, op['rec'], 3)
                 pygame.display.update()
-                print calcularRegExp(0)
+                printRegExp()
                 return accion
             accion+=1
     return nAccion
@@ -362,12 +370,20 @@ def dibujarArista(estFin,nSimbolo):
     #print(arrayEstados)
 
 
-def printText(x,y,text,tam=18):
+def printText(x,y,text,tam=18,color=BLACK,salida=False):
     fuente = pygame.font.Font(None,tam)
-    msg = fuente.render(text, 1, BLACK)
+    msg = fuente.render(text, 1, color)
     msgRect = msg.get_rect()
-    msgRect.centerx = x
-    msgRect.centery = y
+    if(salida):
+        msgRect.left = x 
+        msgRect.top = y 
+        propiedadesRect(msgRect)
+    else:
+        msgRect.centerx = x
+        msgRect.centery = y
+    
+    #print text,msgRect.width
+    
     screen.blit(msg, msgRect)
     
 def printPoint(x,y):
@@ -434,11 +450,14 @@ def isClickedGrid(click,x,y,estado,nTipoEstado,nSimbolo):
         
 def calcularRegExp(nEstado):
     opc = []
-    for a in arrayEstados[nEstado]['aristas']:
-        sig = a['sig']
-        sim = a['sim']
-        re = calcularRegExp(sig)
-        opc.append(Alfabeto[sim]+re)
+    if (len(arrayEstados)):
+        #if arrayEstados[nEstado]['aceptacion']:
+            
+        for a in arrayEstados[nEstado]['aristas']:
+            sig = a['sig']
+            sim = a['sim']
+            re = calcularRegExp(sig)
+            opc.append(Alfabeto[sim]+re)
     
     first = True
     cadRex = ''
@@ -450,7 +469,34 @@ def calcularRegExp(nEstado):
             cadRex+=" + "+op
     
     return cadRex
-        
+
+def printRegExp():
+#    recSalida = pygame.Rect(296,545,425,40)    
+#printText(270,565,"Salida:",15,BLUE)
+    exp = calcularRegExp(0);
+    cargarGridSalida(False)
+    printText(310,555,exp,25,BLUE,True)
+    
+def propiedadesRect(rect):
+    print "top",rect.top
+    print "left",rect.left
+    print "bottom",rect.bottom
+    print "right",rect.right
+    print "topleft",rect.topleft
+    print "bottomleft",rect.bottomleft
+    print "topright",rect.topright
+    print "bottomright",rect.bottomright
+    print "topleft",rect.topleft
+    print "bottomleft",rect.bottomleft
+    print "bottomright",rect.bottomright
+    print "midtop",rect.midtop
+    print "center",rect.center
+    print "centerx",rect.centerx
+    print "centery",rect.centery
+    print "size",rect.size
+    print "width",rect.width
+    print "height",rect.height
+
 def main():
     pygame.init()
     # creamos la ventana y le indicamos un titulo:
@@ -462,11 +508,11 @@ def main():
     time = clock.tick(100000)
     
     
-    global arrayEstados,selArista,Aristas,Alfabeto,Num
+    global arrayEstados,selArista,Aristas,Alfabeto
     arrayEstados=[]
     selArista=[]
     Aristas=[]
-    Alfabeto = ['a','b','c']        
+    Alfabeto = ['a','b','c']    
 
     
     nTipoEstado = 0
@@ -478,10 +524,13 @@ def main():
     
     nAccion = 0
     acciones = cargarAcciones(nAccion)
+    
 
     pygame.draw.rect(screen, BLACK, GRID,1)
     pygame.display.flip()
     mousex,mousey=0,0
+    cargarGridSalida()
+    
     while True:
         clicked = False
         clock.tick(200)
