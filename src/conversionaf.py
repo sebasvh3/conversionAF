@@ -377,7 +377,7 @@ def printText(x,y,text,tam=18,color=BLACK,salida=False):
     if(salida):
         msgRect.left = x 
         msgRect.top = y 
-        propiedadesRect(msgRect)
+#        propiedadesRect(msgRect)
     else:
         msgRect.centerx = x
         msgRect.centery = y
@@ -446,36 +446,54 @@ def isClickedGrid(click,x,y,estado,nTipoEstado,nSimbolo):
             dibEstado(x,y,estado,nTipoEstado)
             return estado+1
     return estado
-     
+
+global soluciones,sum
+soluciones=[]
+sum=[]
         
-def calcularRegExp(nEstado):
-    opc = []
+def calcularRegExp(nEstado,sal):
+    #opc = []
+    sum.append(1)
+    print "call:"+str(len(sum))
     if (len(arrayEstados)):
-        #if arrayEstados[nEstado]['aceptacion']:
-            
-        for a in arrayEstados[nEstado]['aristas']:
-            sig = a['sig']
-            sim = a['sim']
-            re = calcularRegExp(sig)
-            opc.append(Alfabeto[sim]+re)
-    
-    first = True
-    cadRex = ''
-    for op in opc:
-        if first:
-           cadRex+=op
-           first = False
+        if arrayEstados[nEstado]['aceptacion']:
+            print "base"
+            return (True,sal)
+        elif len(arrayEstados[nEstado]['aristas']):
+            for a in arrayEstados[nEstado]['aristas']:
+                sig = a['sig']
+                simNext = sal+Alfabeto[a['sim']]
+                print nEstado,sal,sig,simNext,"call:"+str(len(sum))
+                re = calcularRegExp(sig,simNext)
+                print re
+                #if re[0] and nEstado == 0:
+                if re[0]:
+                    soluciones.append([re[1],nEstado])
         else:
-            cadRex+=" + "+op
+            return (False,"")
     
-    return cadRex
+    return (False,"")
+                    
+            
+    
+#    first = True
+#    cadRex = ''
+#    for op in opc:
+#        if first:
+#           cadRex+=op
+#           first = False
+#        else:
+#            cadRex+=" + "+op
+#    
+#    return cadRex
 
 def printRegExp():
 #    recSalida = pygame.Rect(296,545,425,40)    
 #printText(270,565,"Salida:",15,BLUE)
-    exp = calcularRegExp(0);
+    exp = calcularRegExp(0,'-');
     cargarGridSalida(False)
-    printText(310,555,exp,25,BLUE,True)
+    print soluciones
+    printText(310,555,exp[1],25,BLUE,True)
     
 def propiedadesRect(rect):
     print "top",rect.top
