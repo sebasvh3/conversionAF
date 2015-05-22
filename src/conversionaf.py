@@ -367,7 +367,6 @@ def dibujarArista(estFin,nSimbolo):
     del selArista[:]
     #Se agrega la informacion de la arista en el estado inicial
     estIni['aristas'].append({'sig':estFin['nestado'],'sim':nSimbolo})
-    #print(arrayEstados)
 
 
 def printText(x,y,text,tam=18,color=BLACK,salida=False):
@@ -377,12 +376,9 @@ def printText(x,y,text,tam=18,color=BLACK,salida=False):
     if(salida):
         msgRect.left = x 
         msgRect.top = y 
-#        propiedadesRect(msgRect)
     else:
         msgRect.centerx = x
         msgRect.centery = y
-    
-    #print text,msgRect.width
     
     screen.blit(msg, msgRect)
     
@@ -447,53 +443,50 @@ def isClickedGrid(click,x,y,estado,nTipoEstado,nSimbolo):
             return estado+1
     return estado
 
-global soluciones,sum
-soluciones=[]
-sum=[]
+#global sum
+#sum=[]
         
 def calcularRegExp(nEstado,sal):
     #opc = []
-    sum.append(1)
-    print "call:"+str(len(sum))
+    #sum.append(1)
+    #print "call:"+str(len(sum))
     if (len(arrayEstados)):
         if arrayEstados[nEstado]['aceptacion']:
-            print "base"
+            #print "base"
             return (True,sal)
         elif len(arrayEstados[nEstado]['aristas']):
             for a in arrayEstados[nEstado]['aristas']:
                 sig = a['sig']
                 simNext = sal+Alfabeto[a['sim']]
-                print nEstado,sal,sig,simNext,"call:"+str(len(sum))
+                #print nEstado,sal,sig,simNext,"call:"+str(len(sum))
                 re = calcularRegExp(sig,simNext)
-                print re
+                #print re
                 #if re[0] and nEstado == 0:
                 if re[0]:
-                    soluciones.append([re[1],nEstado])
+                    Soluciones.append([re[1],nEstado])
         else:
             return (False,"")
     
     return (False,"")
                     
-            
-    
-#    first = True
-#    cadRex = ''
-#    for op in opc:
-#        if first:
-#           cadRex+=op
-#           first = False
-#        else:
-#            cadRex+=" + "+op
-#    
-#    return cadRex
+
+def orderSolution():
+    first = True
+    cadRex = ''
+    for sol in Soluciones:
+        if first:
+            cadRex+=sol[0]
+            first = False
+        else:
+            cadRex+=" + "+sol[0]
+    return cadRex
 
 def printRegExp():
-#    recSalida = pygame.Rect(296,545,425,40)    
-#printText(270,565,"Salida:",15,BLUE)
-    exp = calcularRegExp(0,'-');
+    del Soluciones[:]
+    exp = calcularRegExp(0,'');
     cargarGridSalida(False)
-    print soluciones
-    printText(310,555,exp[1],25,BLUE,True)
+    print Soluciones
+    printText(310,555,orderSolution(),25,BLUE,True)
     
 def propiedadesRect(rect):
     print "top",rect.top
@@ -526,11 +519,12 @@ def main():
     time = clock.tick(100000)
     
     
-    global arrayEstados,selArista,Aristas,Alfabeto
+    global arrayEstados,selArista,Aristas,Alfabeto,Soluciones
     arrayEstados=[]
     selArista=[]
     Aristas=[]
-    Alfabeto = ['a','b','c']    
+    Alfabeto = ['a','b','c']
+    Soluciones=[]
 
     
     nTipoEstado = 0
