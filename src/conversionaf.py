@@ -367,6 +367,7 @@ def dibujarArista(estFin,nSimbolo):
     del selArista[:]
     #Se agrega la informacion de la arista en el estado inicial
     estIni['aristas'].append({'sig':estFin['nestado'],'sim':nSimbolo})
+    print arrayEstados
 
 
 def printText(x,y,text,tam=18,color=BLACK,salida=False):
@@ -443,8 +444,8 @@ def isClickedGrid(click,x,y,estado,nTipoEstado,nSimbolo):
             return estado+1
     return estado
 
-#global sum
-#sum=[]
+global camino
+camino=[]
         
 def calcularRegExp(nEstado,sal):
     #opc = []
@@ -455,15 +456,19 @@ def calcularRegExp(nEstado,sal):
             #print "base"
             return (True,sal)
         elif len(arrayEstados[nEstado]['aristas']):
+            ia = 0
             for a in arrayEstados[nEstado]['aristas']:
                 sig = a['sig']
                 simNext = sal+Alfabeto[a['sim']]
                 #print nEstado,sal,sig,simNext,"call:"+str(len(sum))
                 re = calcularRegExp(sig,simNext)
-                #print re
+                print "re-->",nEstado
+                print re
                 #if re[0] and nEstado == 0:
                 if re[0]:
                     Soluciones.append([re[1],nEstado])
+                camino.append({'estado':nEstado,'ia':ia})
+                ia+=1
         else:
             return (False,"")
     
@@ -483,10 +488,13 @@ def orderSolution():
 
 def printRegExp():
     del Soluciones[:]
+    del camino[:]
+    
     exp = calcularRegExp(0,'');
     cargarGridSalida(False)
     print Soluciones
     printText(310,555,orderSolution(),25,BLUE,True)
+    print camino
     
 def propiedadesRect(rect):
     print "top",rect.top
