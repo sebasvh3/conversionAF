@@ -367,7 +367,6 @@ def dibujarArista(estFin,nSimbolo):
     del selArista[:]
     #Se agrega la informacion de la arista en el estado inicial
     estIni['aristas'].append({'sig':estFin['nestado'],'sim':nSimbolo})
-    print arrayEstados
 
 
 def printText(x,y,text,tam=18,color=BLACK,salida=False):
@@ -445,35 +444,61 @@ def isClickedGrid(click,x,y,estado,nTipoEstado,nSimbolo):
     return estado
 
 global camino
-camino=[]
+camino=[[]]
         
-def calcularRegExp(nEstado,sal):
+def calcularRegExp(nEstado,sal,cam):
     #opc = []
     #sum.append(1)
     #print "call:"+str(len(sum))
     if (len(arrayEstados)):
         if arrayEstados[nEstado]['aceptacion']:
             #print "base"
-            return (True,sal)
+            return (True,sal,cam)
         elif len(arrayEstados[nEstado]['aristas']):
             ia = 0
             for a in arrayEstados[nEstado]['aristas']:
                 sig = a['sig']
                 simNext = sal+Alfabeto[a['sim']]
                 #print nEstado,sal,sig,simNext,"call:"+str(len(sum))
-                re = calcularRegExp(sig,simNext)
-                print "re-->",nEstado
-                print re
+#                if cam >= len(camino):
+#                    camino.append([])
+#                if estadoEnCamino(nEstado,ia,cam):
+#                    return (False,sal,cam)
+                if ia==0:
+                    camino[cam].append({"ne":nEstado,"ia":ia})
+                else:
+                    newCam = camino[cam][:]
+                    newCam.pop()
+                    camino.append(newCam)
+                    camino[cam+ia].append({"ne":nEstado,"ia":ia})
+            
+                re = calcularRegExp(sig,simNext,cam+ia)
+                #print re
                 #if re[0] and nEstado == 0:
                 if re[0]:
                     Soluciones.append([re[1],nEstado])
-                camino.append({'estado':nEstado,'ia':ia})
+                    #return (True,sal)
                 ia+=1
         else:
-            return (False,"")
+            return (False,sal,cam)
+    return (False,sal,cam)
     
-    return (False,"")
-                    
+def estadoEnCamino(nEstado,ia,cam):
+#    print "camino:",cam
+#    print "camino:",camino
+    for c in camino[cam]:
+        if c['ne']==nEstado and c['ia']==ia:
+            return True
+    return False
+
+def verCaminos():
+    cont = 0
+    for cam in camino:
+        cad = "--> "+str(cont)+":    "
+        for c in cam:
+            cad+= str(c['ne'])+","+str(c['ia'])+"  "
+        print cad
+        cont+=1
 
 def orderSolution():
     first = True
@@ -489,13 +514,16 @@ def orderSolution():
 def printRegExp():
     del Soluciones[:]
     del camino[:]
-    
-    exp = calcularRegExp(0,'');
+    camino.append([])
+    exp = calcularRegExp(0,'',0);
     cargarGridSalida(False)
     print Soluciones
     printText(310,555,orderSolution(),25,BLUE,True)
-    print camino
+    #print camino
+    verCaminos()
     
+
+
 def propiedadesRect(rect):
     print "top",rect.top
     print "left",rect.left
@@ -579,3 +607,10 @@ def main():
                          
 if __name__ == "__main__":
     main()
+    
+    
+#[['aaa', 2], ['aaaaaaaa', 8], ['aa', 1]]
+#--> 0: 0,0  1,0  2,0  
+#--> 1: 0,0  1,0  2,1  4,0  5,0  6,0  7,0  8,0  1,1  
+#--> 2: 0,0  1,0  2,1  4,0  5,0  6,0  7,0  4,1  
+#--> 3: 0,0  1,0  
