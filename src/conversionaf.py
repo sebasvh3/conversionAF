@@ -309,7 +309,7 @@ def dibEstado(x,y,estado,aceptacion=0):
         rec2.centery=y
         pygame.draw.ellipse(screen, BLACK, rec2, 1) #borde
     
-    #Estructura arrayEstados['aristas'] --> []
+    #Estructura arrayEstados['aristas'] -- []
     #{'sig':nEstadoSig,'sim':simbolo}
     arrayEstados.append({'rec':rec,'nestado':estado,'aceptacion':aceptacion,'aristas': []})
     
@@ -460,7 +460,7 @@ def calcularRegExp(nEstado,sal,cam):
                 sig = a['sig']
                 simNext = sal+Alfabeto[a['sim']]
                 #print nEstado,sal,sig,simNext,"call:"+str(len(sum))
-#                if cam >= len(camino):
+#                if cam = len(camino):
 #                    camino.append([])
 #                if estadoEnCamino(nEstado,ia,cam):
 #                    return (False,sal,cam)
@@ -471,6 +471,7 @@ def calcularRegExp(nEstado,sal,cam):
                     newCam.pop()
                     camino.append(newCam)
                     camino[cam+ia].append({"ne":nEstado,"ia":ia})
+                    print nEstado,cam
             
                 re = calcularRegExp(sig,simNext,cam+ia)
                 #print re
@@ -494,7 +495,7 @@ def estadoEnCamino(nEstado,ia,cam):
 def verCaminos():
     cont = 0
     for cam in camino:
-        cad = "--> "+str(cont)+":    "
+        cad = "-- "+str(cont)+":    "
         for c in cam:
             cad+= str(c['ne'])+","+str(c['ia'])+"  "
         print cad
@@ -512,6 +513,7 @@ def orderSolution():
     return cadRex
 
 def printRegExp():
+    print arrayEstados
     del Soluciones[:]
     del camino[:]
     camino.append([])
@@ -562,6 +564,21 @@ def main():
     Alfabeto = ['a','b','c']
     Soluciones=[]
 
+    #TEST
+#    arrayEstados.append( {'rec': (78, 398, 40, 40), 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0}]})
+#    arrayEstados.append({'rec': (147, 334, 40, 40), 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 3, 'sim': 0}, {'sig': 2, 'sim': 0}]})
+#    arrayEstados.append({'rec': (211, 380, 40, 40), 'aceptacion': 0, 'nestado': 2, 'aristas': [{'sig': 3, 'sim': 1}, {'sig': 4, 'sim': 1}]})
+#    arrayEstados.append({'rec': (157, 442, 40, 40), 'aceptacion': 1, 'nestado': 3, 'aristas': []})
+#    arrayEstados.append({'rec': (313, 364, 40, 40), 'aceptacion': 0, 'nestado': 4, 'aristas': [{'sig': 5, 'sim': 0}, {'sig': 7, 'sim': 2}]})
+#    arrayEstados.append({'rec': (400, 334, 40, 40), 'aceptacion': 0, 'nestado': 5, 'aristas': [{'sig': 6, 'sim': 1}]})
+#    arrayEstados.append({'rec': (438, 390, 40, 40), 'aceptacion': 0, 'nestado': 6, 'aristas': [{'sig': 7, 'sim': 1}]})
+#    arrayEstados.append({'rec': (429, 456, 40, 40), 'aceptacion': 0, 'nestado': 7, 'aristas': [{'sig': 8, 'sim': 0}]})
+#    arrayEstados.append({'rec': (316, 470, 40, 40), 'aceptacion': 0, 'nestado': 8, 'aristas': [{'sig': 9, 'sim': 1}]})
+#    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado': 9, 'aristas': [{'sig': 3, 'sim': 1}]})
+    #[, , , , , , , , , ]
+    #[{'rec': (78, 398, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 1, 'sim': 0}], 'nestado': 0}, {'rec': (147, 334, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 3, 'sim': 0}, {'sig': 2, 'sim': 0}], 'nestado': 1}, {'rec': (211, 380, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 3, 'sim': 1}, {'sig': 4, 'sim': 1}], 'nestado': 2}, {'rec': (157, 442, 40, 40), 'aceptacion': 1, 'aristas': [], 'nestado': 3}, {'rec': (313, 364, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 5, 'sim': 0}, {'sig': 7, 'sim': 2}], 'nestado': 4}, {'rec': (400, 334, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 6, 'sim': 1}], 'nestado': 5}, {'rec': (438, 390, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 7, 'sim': 1}], 'nestado': 6}, {'rec': (429, 456, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 8, 'sim': 0}], 'nestado': 7}, {'rec': (316, 470, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 9, 'sim': 1}], 'nestado': 8}, {'rec': (227, 464, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 3, 'sim': 1}], 'nestado': 9}]
+#    printRegExp()
+
     
     nTipoEstado = 0
     tipoEstados = cargarPanelEstados(nTipoEstado)
@@ -610,7 +627,7 @@ if __name__ == "__main__":
     
     
 #[['aaa', 2], ['aaaaaaaa', 8], ['aa', 1]]
-#--> 0: 0,0  1,0  2,0  
-#--> 1: 0,0  1,0  2,1  4,0  5,0  6,0  7,0  8,0  1,1  
-#--> 2: 0,0  1,0  2,1  4,0  5,0  6,0  7,0  4,1  
-#--> 3: 0,0  1,0  
+#-- 0: 0,0  1,0  2,0  
+#-- 1: 0,0  1,0  2,1  4,0  5,0  6,0  7,0  8,0  1,1  
+#-- 2: 0,0  1,0  2,1  4,0  5,0  6,0  7,0  4,1  
+#-- 3: 0,0  1,0  
