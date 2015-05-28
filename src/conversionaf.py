@@ -446,38 +446,52 @@ def isClickedGrid(click,x,y,estado,nTipoEstado,nSimbolo):
 global camino
 camino=[[]]
         
-def calcularRegExp(nEstado,sal,cam):
+def calcularRegExp(nEstado,sal,cam,lon):
     #opc = []
     #sum.append(1)
     #print "call:"+str(len(sum))
     if (len(arrayEstados)):
         if arrayEstados[nEstado]['aceptacion']:
             #print "base"
-            return (True,sal,cam)
+            return (True,sal,cam,lon)
         elif len(arrayEstados[nEstado]['aristas']):
             ia = 0
+            bif = len(arrayEstados[nEstado]['aristas'])
             for a in arrayEstados[nEstado]['aristas']:
                 sig = a['sig']
                 simNext = sal+Alfabeto[a['sim']]
                 #print nEstado,sal,sig,simNext,"call:"+str(len(sum))
-#                if cam = len(camino):
-#                    camino.append([])
-#                if estadoEnCamino(nEstado,ia,cam):
-#                    return (False,sal,cam)
+
+                if estadoEnCamino(nEstado,ia,cam):
+                #if estadoEnCamino(sig,ia,cam):
+                #if lon==10:
+                    #print camino,cam
+                    #print nEstado,ia
+                    #print getCerradura(camino[cam],nEstado,ia),sal
+                    return (False,sal,cam,lon) 
                 if ia==0:
-                    camino[cam].append({"ne":nEstado,"ia":ia})
+                    #print cam,nEstado
+                    camino[cam].append({"ne":nEstado,"ia":ia,"bif":bif,"sim":a['sim']})
+                    re = calcularRegExp(sig,simNext,cam,lon+1)
                 else:
-                    newCam = camino[cam][:]
-                    newCam.pop()
+                    #print cam,nEstado
+                    newCam = camino[cam][:lon]
+                    #newCam.pop()
                     camino.append(newCam)
-                    camino[cam+ia].append({"ne":nEstado,"ia":ia})
-                    print nEstado,cam
-            
-                re = calcularRegExp(sig,simNext,cam+ia)
+                    #camino[cam+ia].append({"ne":nEstado,"ia":ia})
+                    #camino[len(Soluciones)].append({"ne":nEstado,"ia":ia,"bif":bif,"sim":a['sim']})
+                    camino[len(camino)-1].append({"ne":nEstado,"ia":ia,"bif":bif,"sim":a['sim']})
+                    re = calcularRegExp(sig,simNext,len(camino)-1,lon+1)
+                    #print "lon: "+str(lon)
+                
+                   
+                    
+                #re = calcularRegExp(sig,simNext,cam+ia,lon+1)
                 #print re
                 #if re[0] and nEstado == 0:
                 if re[0]:
-                    Soluciones.append([re[1],nEstado])
+                    print re
+                    Soluciones.append([re[1],nEstado,lon,cam])
                     #return (True,sal)
                 ia+=1
         else:
@@ -492,11 +506,32 @@ def estadoEnCamino(nEstado,ia,cam):
             return True
     return False
 
+def getCerradura(cam,nEstado,ia):
+    #Retroceder hasta hallar la primera bifurcacion
+    #print nEstado,ia
+    bif = False
+    fcer = ""
+    lcer = ""
+    for i in range(-1,-1*(len(cam)+1),-1):
+        #print i,-1*len(cam)
+        if not bif:
+           fcer =  Alfabeto[cam[i]['sim']]+fcer
+           if cam[i]['bif']>1 :
+               bif=True
+        else:
+           lcer = Alfabeto[cam[i]['sim']]+lcer
+        if nEstado == cam[i]['ne'] and cam[i]['ia'] == ia:
+            break
+    return "("+fcer+lcer+")*"
+    
+               
+
 def verCaminos():
     cont = 0
     for cam in camino:
         cad = "-- "+str(cont)+":    "
         for c in cam:
+            #cad+= str(c['ne'])+","+str(c['ia'])+","+str(c['bif'])+","+Alfabeto[c['sim']]+" "
             cad+= str(c['ne'])+","+str(c['ia'])+"  "
         print cad
         cont+=1
@@ -513,11 +548,11 @@ def orderSolution():
     return cadRex
 
 def printRegExp():
-    print arrayEstados
+    #print arrayEstados
     del Soluciones[:]
     del camino[:]
     camino.append([])
-    exp = calcularRegExp(0,'',0);
+    exp = calcularRegExp(0,'',0,0);
     cargarGridSalida(False)
     print Soluciones
     printText(310,555,orderSolution(),25,BLUE,True)
@@ -550,7 +585,8 @@ def main():
     pygame.init()
     # creamos la ventana y le indicamos un titulo:
     global screen
-    screen = pygame.display.set_mode((PantX, PantY))
+#    screen = pygame.display.set_mode((PantX, PantY))
+    screen = pygame.display.set_mode((10, 10))
     pygame.display.set_caption("Conversión Autómata!")
     screen.fill(WHITE)
     clock = pygame.time.Clock()
@@ -565,19 +601,37 @@ def main():
     Soluciones=[]
 
     #TEST
-#    arrayEstados.append( {'rec': (78, 398, 40, 40), 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0}]})
-#    arrayEstados.append({'rec': (147, 334, 40, 40), 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 3, 'sim': 0}, {'sig': 2, 'sim': 0}]})
-#    arrayEstados.append({'rec': (211, 380, 40, 40), 'aceptacion': 0, 'nestado': 2, 'aristas': [{'sig': 3, 'sim': 1}, {'sig': 4, 'sim': 1}]})
-#    arrayEstados.append({'rec': (157, 442, 40, 40), 'aceptacion': 1, 'nestado': 3, 'aristas': []})
-#    arrayEstados.append({'rec': (313, 364, 40, 40), 'aceptacion': 0, 'nestado': 4, 'aristas': [{'sig': 5, 'sim': 0}, {'sig': 7, 'sim': 2}]})
-#    arrayEstados.append({'rec': (400, 334, 40, 40), 'aceptacion': 0, 'nestado': 5, 'aristas': [{'sig': 6, 'sim': 1}]})
-#    arrayEstados.append({'rec': (438, 390, 40, 40), 'aceptacion': 0, 'nestado': 6, 'aristas': [{'sig': 7, 'sim': 1}]})
-#    arrayEstados.append({'rec': (429, 456, 40, 40), 'aceptacion': 0, 'nestado': 7, 'aristas': [{'sig': 8, 'sim': 0}]})
-#    arrayEstados.append({'rec': (316, 470, 40, 40), 'aceptacion': 0, 'nestado': 8, 'aristas': [{'sig': 9, 'sim': 1}]})
-#    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado': 9, 'aristas': [{'sig': 3, 'sim': 1}]})
+    #Automata 1
+    arrayEstados.append( {'rec': (78, 398, 40, 40), 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0}]})
+    arrayEstados.append({'rec': (147, 334, 40, 40), 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 3, 'sim': 0}, {'sig': 2, 'sim': 0}]})
+    arrayEstados.append({'rec': (211, 380, 40, 40), 'aceptacion': 0, 'nestado': 2, 'aristas': [{'sig': 3, 'sim': 1}, {'sig': 4, 'sim': 1}]})
+    arrayEstados.append({'rec': (157, 442, 40, 40), 'aceptacion': 1, 'nestado': 3, 'aristas': []})
+    arrayEstados.append({'rec': (313, 364, 40, 40), 'aceptacion': 0, 'nestado': 4, 'aristas': [{'sig': 5, 'sim': 0},{'sig': 7, 'sim': 2}, ]})
+    arrayEstados.append({'rec': (400, 334, 40, 40), 'aceptacion': 0, 'nestado': 5, 'aristas': [{'sig': 10, 'sim': 1},{'sig': 6, 'sim': 1}, ]})
+    arrayEstados.append({'rec': (438, 390, 40, 40), 'aceptacion': 0, 'nestado': 6, 'aristas': [{'sig': 7, 'sim': 1}, ]})
+    arrayEstados.append({'rec': (429, 456, 40, 40), 'aceptacion': 0, 'nestado': 7, 'aristas': [{'sig': 8, 'sim': 0}]})
+    arrayEstados.append({'rec': (316, 470, 40, 40), 'aceptacion': 0, 'nestado': 8, 'aristas': [{'sig': 9, 'sim': 1}]})
+    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado': 9, 'aristas': [{'sig': 3, 'sim': 1}]})
+    
+    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':10, 'aristas': [{'sig':11, 'sim': 1}]})
+    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':11, 'aristas': [{'sig':12, 'sim': 2}]})
+    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':12, 'aristas': [{'sig':13, 'sim': 0},{'sig': 3, 'sim': 2}]})
+    #arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':13, 'aristas': [{'sig': 3, 'sim': 1},]})
+    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':13, 'aristas': [{'sig': 3, 'sim': 1},]})
+#    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':13, 'aristas': []})
     #[, , , , , , , , , ]
     #[{'rec': (78, 398, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 1, 'sim': 0}], 'nestado': 0}, {'rec': (147, 334, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 3, 'sim': 0}, {'sig': 2, 'sim': 0}], 'nestado': 1}, {'rec': (211, 380, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 3, 'sim': 1}, {'sig': 4, 'sim': 1}], 'nestado': 2}, {'rec': (157, 442, 40, 40), 'aceptacion': 1, 'aristas': [], 'nestado': 3}, {'rec': (313, 364, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 5, 'sim': 0}, {'sig': 7, 'sim': 2}], 'nestado': 4}, {'rec': (400, 334, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 6, 'sim': 1}], 'nestado': 5}, {'rec': (438, 390, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 7, 'sim': 1}], 'nestado': 6}, {'rec': (429, 456, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 8, 'sim': 0}], 'nestado': 7}, {'rec': (316, 470, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 9, 'sim': 1}], 'nestado': 8}, {'rec': (227, 464, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 3, 'sim': 1}], 'nestado': 9}]
-#    printRegExp()
+    
+    
+    #Automata 2
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0}]})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 2, 'sim': 1}]})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 2, 'aristas': [{'sig': 5, 'sim': 2},{'sig': 3, 'sim': 2},]})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 3, 'aristas': [{'sig': 4, 'sim': 2}]})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 1, 'nestado': 4, 'aristas': []})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 5, 'aristas': [{'sig': 0, 'sim': 1}]})
+    
+    printRegExp()
 
     
     nTipoEstado = 0
@@ -631,3 +685,16 @@ if __name__ == "__main__":
 #-- 1: 0,0  1,0  2,1  4,0  5,0  6,0  7,0  8,0  1,1  
 #-- 2: 0,0  1,0  2,1  4,0  5,0  6,0  7,0  4,1  
 #-- 3: 0,0  1,0  
+
+
+#-- 0:    0,0  1,0  
+#-- 1:    0,0  1,1  2,0  
+#-- 2:    0,0  1,1  2,1  4,0  5,0  6,0  7,0  8,0  9,0  
+#-- 3:    0,0  1,1  2,1  4,0  5,1  10,0  11,0  12,0  13,0  4,1  
+#-- 4:    0,0  1,1  2,1  7,0  8,0  9,0 
+
+#-- 0:    0,0  1,0  
+#-- 1:    0,0  1,1  2,0  
+#-- 2:    0,0  1,1  2,1  4,0  5,0  6,0  7,0  8,0  9,0  
+#-- 3:    0,0  1,1  2,1  4,0  5,1  10,0  11,0  12,0  13,0  4,1  7,0  8,0  9,0  
+#-- 4:    0,0  1,1  2,1  
