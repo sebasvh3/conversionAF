@@ -443,8 +443,9 @@ def isClickedGrid(click,x,y,estado,nTipoEstado,nSimbolo):
             return estado+1
     return estado
 
-global camino
+global camino,cerraduras
 camino=[[]]
+cerraduras={}
         
 def calcularRegExp(nEstado,sal,cam,lon):
     #opc = []
@@ -467,11 +468,14 @@ def calcularRegExp(nEstado,sal,cam,lon):
                 #if lon==10:
                     #print camino,cam
                     #print nEstado,ia
-                    #print getCerradura(camino[cam],nEstado,ia),sal
+                    #cerraduras.append(getCerradura(camino[cam],nEstado,ia))
+                    getCerradura(camino[cam],nEstado,ia)
+                    print "Hubo estado en camino"
                     return (False,sal,cam,lon) 
                 if ia==0:
                     #print cam,nEstado
                     camino[cam].append({"ne":nEstado,"ia":ia,"bif":bif,"sim":a['sim']})
+#                    print "--->",cam
                     re = calcularRegExp(sig,simNext,cam,lon+1)
                 else:
                     #print cam,nEstado
@@ -480,7 +484,8 @@ def calcularRegExp(nEstado,sal,cam,lon):
                     camino.append(newCam)
                     #camino[cam+ia].append({"ne":nEstado,"ia":ia})
                     #camino[len(Soluciones)].append({"ne":nEstado,"ia":ia,"bif":bif,"sim":a['sim']})
-                    camino[len(camino)-1].append({"ne":nEstado,"ia":ia,"bif":bif,"sim":a['sim']})
+                    camino[-1].append({"ne":nEstado,"ia":ia,"bif":bif,"sim":a['sim']})
+                    print "newCam",len(camino)-1,"sal->",simNext
                     re = calcularRegExp(sig,simNext,len(camino)-1,lon+1)
                     #print "lon: "+str(lon)
                 
@@ -491,12 +496,13 @@ def calcularRegExp(nEstado,sal,cam,lon):
                 #if re[0] and nEstado == 0:
                 if re[0]:
                     print re
-                    Soluciones.append([re[1],nEstado,lon,cam])
+                    #Soluciones.append([re[1],nEstado,cam])
+                    Soluciones.append([re[1],re[2]])
                     #return (True,sal)
                 ia+=1
         else:
-            return (False,sal,cam)
-    return (False,sal,cam)
+            return (False,sal,cam,lon)
+    return (False,sal,cam,lon)
     
 def estadoEnCamino(nEstado,ia,cam):
 #    print "camino:",cam
@@ -512,17 +518,21 @@ def getCerradura(cam,nEstado,ia):
     bif = False
     fcer = ""
     lcer = ""
+    estado = -1
     for i in range(-1,-1*(len(cam)+1),-1):
         #print i,-1*len(cam)
         if not bif:
            fcer =  Alfabeto[cam[i]['sim']]+fcer
            if cam[i]['bif']>1 :
+               print cam[i]
                bif=True
+               estado = cam[i]['ne']
         else:
            lcer = Alfabeto[cam[i]['sim']]+lcer
         if nEstado == cam[i]['ne'] and cam[i]['ia'] == ia:
             break
-    return "("+fcer+lcer+")*"
+    cer = "("+fcer+lcer+")*"
+    cerraduras[estado]=cer
     
                
 
@@ -547,17 +557,30 @@ def orderSolution():
             cadRex+=" + "+sol[0]
     return cadRex
 
+def getRexExpByCamino():
+    for sol in Soluciones:
+        exp = ""
+        for cam in camino[sol[1]]:
+            if cerraduras.has_key(cam['ne']):
+                exp+=cerraduras[cam['ne']]
+            exp+=Alfabeto[cam['sim']]
+        print exp
+    
+
 def printRegExp():
     #print arrayEstados
     del Soluciones[:]
     del camino[:]
+    cerraduras={}
     camino.append([])
     exp = calcularRegExp(0,'',0,0);
     cargarGridSalida(False)
     print Soluciones
     printText(310,555,orderSolution(),25,BLUE,True)
-    #print camino
+    print len(camino)
+    print camino
     verCaminos()
+    getRexExpByCamino()
     
 
 
@@ -621,15 +644,23 @@ def main():
 #    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':13, 'aristas': []})
     #[, , , , , , , , , ]
     #[{'rec': (78, 398, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 1, 'sim': 0}], 'nestado': 0}, {'rec': (147, 334, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 3, 'sim': 0}, {'sig': 2, 'sim': 0}], 'nestado': 1}, {'rec': (211, 380, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 3, 'sim': 1}, {'sig': 4, 'sim': 1}], 'nestado': 2}, {'rec': (157, 442, 40, 40), 'aceptacion': 1, 'aristas': [], 'nestado': 3}, {'rec': (313, 364, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 5, 'sim': 0}, {'sig': 7, 'sim': 2}], 'nestado': 4}, {'rec': (400, 334, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 6, 'sim': 1}], 'nestado': 5}, {'rec': (438, 390, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 7, 'sim': 1}], 'nestado': 6}, {'rec': (429, 456, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 8, 'sim': 0}], 'nestado': 7}, {'rec': (316, 470, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 9, 'sim': 1}], 'nestado': 8}, {'rec': (227, 464, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 3, 'sim': 1}], 'nestado': 9}]
-    
-    
+    printRegExp()
+    print "-->",cerraduras
     #Automata 2
-#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0}]})
-#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 2, 'sim': 1}]})
-#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 2, 'aristas': [{'sig': 5, 'sim': 2},{'sig': 3, 'sim': 2},]})
-#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 3, 'aristas': [{'sig': 4, 'sim': 2}]})
-#    arrayEstados.append( {'rec': 0, 'aceptacion': 1, 'nestado': 4, 'aristas': []})
-#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 5, 'aristas': [{'sig': 0, 'sim': 1}]})
+    arrayEstados=[]
+    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0}]})
+    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 2, 'sim': 1}]})
+    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 2, 'aristas': [{'sig': 5, 'sim': 2},{'sig': 3, 'sim': 2},{'sig': 4, 'sim': 0}]})
+    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 3, 'aristas': [{'sig': 4, 'sim': 2}]})
+    arrayEstados.append( {'rec': 0, 'aceptacion': 1, 'nestado': 4, 'aristas': []})
+    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 5, 'aristas': [{'sig': 0, 'sim': 1}]})
+    
+    printRegExp()
+    
+    arrayEstados=[]
+    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0}]})
+    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 2, 'sim': 2},{'sig': 0, 'sim': 1}]})
+    arrayEstados.append( {'rec': 0, 'aceptacion': 1, 'nestado': 2, 'aristas': []})
     
     printRegExp()
 
@@ -698,3 +729,7 @@ if __name__ == "__main__":
 #-- 2:    0,0  1,1  2,1  4,0  5,0  6,0  7,0  8,0  9,0  
 #-- 3:    0,0  1,1  2,1  4,0  5,1  10,0  11,0  12,0  13,0  4,1  7,0  8,0  9,0  
 #-- 4:    0,0  1,1  2,1  
+
+#[[{'ia': 0, 'bif': 1, 'ne': 0, 'sim': 0}, {'ia': 0, 'bif': 1, 'ne': 1, 'sim': 1}, {'ia': 0, 'bif': 2, 'ne': 2, 'sim': 2}, {'ia': 0, 'bif': 1, 'ne': 5, 'sim': 1}], ]
+
+#[{'ia': 0, 'bif': 1, 'ne': 0, 'sim': 0}, {'ia': 0, 'bif': 1, 'ne': 1, 'sim': 1}, {'ia': 1, 'bif': 2, 'ne': 2, 'sim': 2}, {'ia': 0, 'bif': 1, 'ne': 3, 'sim': 2}]
