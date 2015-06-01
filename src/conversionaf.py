@@ -54,7 +54,6 @@ def cargarPanelEstados(estado):
     recuadro1 = pygame.Rect(0,0,aR,aR)
     recuadro1.centerx=xIni
     recuadro1.centery=yIni
-    #figuras.append(recuadro2)
     figuras.append({'rec':recuadro1,'selected':False})
 
     if(estado == 0):
@@ -77,7 +76,6 @@ def cargarPanelEstados(estado):
     recuadro2 = pygame.Rect(0,0,aR,aR)
     recuadro2.centerx=xIni+dis
     recuadro2.centery=yIni
-    #figuras.append(recuadro2)
     figuras.append({'rec':recuadro2,'selected':False})
     
     if(estado == 1):
@@ -98,6 +96,24 @@ def cargarPanelEstados(estado):
     
     #fuente
     printText(xIni+dis,yIni,text)
+    
+    
+    
+    #Estado que es de aceptacion
+    recuadro3 = pygame.Rect(0,0,aR,aR)
+    recuadro3.centerx=xIni+dis+dis
+    recuadro3.centery=yIni
+    figuras.append({'rec':recuadro3,'selected':False})
+    #Borrar estado
+    if(estado == 2):
+        pygame.draw.rect(screen, BLUE2, recuadro3)
+    pygame.draw.rect(screen, BLACK, recuadro3,1)
+    #Imagen Interna
+    recBorrar = pygame.Rect(0,0,aI,aI)
+    recBorrar.centerx = xIni+dis+dis
+    recBorrar.centery = yIni
+    pygame.draw.rect(screen, WHITE, recBorrar)
+    pygame.draw.rect(screen, BLACK, recBorrar,1)
     
     
     pygame.display.update()
@@ -369,6 +385,13 @@ def dibujarArista(estFin,nSimbolo):
     estIni['aristas'].append({'sig':estFin['nestado'],'sim':nSimbolo})
 
 
+def borrarEstado(est):
+    propiedadesRect(est['rec'])
+    
+    est['rec'].width = 45
+    est['rec'].height = 45
+    pygame.draw.ellipse(screen, WHITE, est['rec']) #borde
+
 def printText(x,y,text,tam=18,color=BLACK,salida=False):
     fuente = pygame.font.Font(None,tam)
     msg = fuente.render(text, 1, color)
@@ -425,16 +448,37 @@ def getHeadArrow(x1,y1,x2,y2):
     pygame.draw.polygon(screen, BLACK, [p1, p2, p3])
 
     
+def propiedadesRect(rect):
+    print "top",rect.top
+    print "left",rect.left
+    print "bottom",rect.bottom
+    print "right",rect.right
+    print "topleft",rect.topleft
+    print "bottomleft",rect.bottomleft
+    print "topright",rect.topright
+    print "bottomright",rect.bottomright
+    print "topleft",rect.topleft
+    print "bottomleft",rect.bottomleft
+    print "bottomright",rect.bottomright
+    print "midtop",rect.midtop
+    print "center",rect.center
+    print "centerx",rect.centerx
+    print "centery",rect.centery
+    print "size",rect.size
+    print "width",rect.width
+    print "height",rect.height
 
 
-#def isClickedGrid(click,x,y,nfig,nColor,nTam):
 def isClickedGrid(click,x,y,estado,nTipoEstado,nSimbolo):
     if click:
         if GRID.collidepoint(x,y):
             #Revisa si es sobre un estado ya creado
             for est in arrayEstados:
                 if est['rec'].collidepoint(x,y):
-                    if len(selArista):
+                    
+                    if(nTipoEstado == 2):
+                        borrarEstado(est)
+                    elif len(selArista):
                         dibujarArista(est,nSimbolo)
                     else:
                         dibEstadoExistente(est)
@@ -448,9 +492,6 @@ camino=[[]]
 cerraduras={}
         
 def calcularRegExp(nEstado,sal,cam,lon):
-    #opc = []
-    #sum.append(1)
-    #print "call:"+str(len(sum))
     if (len(arrayEstados)):
         if arrayEstados[nEstado]['aceptacion']:
             #print "base"
@@ -464,41 +505,21 @@ def calcularRegExp(nEstado,sal,cam,lon):
                 #print nEstado,sal,sig,simNext,"call:"+str(len(sum))
 
                 if estadoEnCamino(nEstado,ia,cam):
-                #if estadoEnCamino(sig,ia,cam):
-                #if lon==10:
-                    #print camino,cam
-                    #print nEstado,ia
-                    #cerraduras.append(getCerradura(camino[cam],nEstado,ia))
+                    print "camino por donde entra",cam,nEstado,ia
                     getCerradura(camino[cam],nEstado,ia)
-                    print "Hubo estado en camino"
+                    #print "Hubo estado en camino",cerraduras
                     return (False,sal,cam,lon) 
                 if ia==0:
-                    #print cam,nEstado
                     camino[cam].append({"ne":nEstado,"ia":ia,"bif":bif,"sim":a['sim']})
-#                    print "--->",cam
                     re = calcularRegExp(sig,simNext,cam,lon+1)
                 else:
-                    #print cam,nEstado
                     newCam = camino[cam][:lon]
-                    #newCam.pop()
                     camino.append(newCam)
-                    #camino[cam+ia].append({"ne":nEstado,"ia":ia})
-                    #camino[len(Soluciones)].append({"ne":nEstado,"ia":ia,"bif":bif,"sim":a['sim']})
                     camino[-1].append({"ne":nEstado,"ia":ia,"bif":bif,"sim":a['sim']})
-                    print "newCam",len(camino)-1,"sal->",simNext
                     re = calcularRegExp(sig,simNext,len(camino)-1,lon+1)
-                    #print "lon: "+str(lon)
                 
-                   
-                    
-                #re = calcularRegExp(sig,simNext,cam+ia,lon+1)
-                #print re
-                #if re[0] and nEstado == 0:
                 if re[0]:
-                    print re
-                    #Soluciones.append([re[1],nEstado,cam])
                     Soluciones.append([re[1],re[2]])
-                    #return (True,sal)
                 ia+=1
         else:
             return (False,sal,cam,lon)
@@ -509,6 +530,8 @@ def estadoEnCamino(nEstado,ia,cam):
 #    print "camino:",camino
     for c in camino[cam]:
         if c['ne']==nEstado and c['ia']==ia:
+        #if c['ne']==nEstado:
+            print "sale ",nEstado
             return True
     return False
 
@@ -519,6 +542,8 @@ def getCerradura(cam,nEstado,ia):
     fcer = ""
     lcer = ""
     estado = -1
+    print "cerradura cam",cam,nEstado,ia
+    print range(-1,-1*(len(cam)+1),-1)
     for i in range(-1,-1*(len(cam)+1),-1):
         #print i,-1*len(cam)
         if not bif:
@@ -558,7 +583,9 @@ def orderSolution():
     return cadRex
 
 def getRexExpByCamino():
+    #print "getRexExpByCamino",cerraduras
     for sol in Soluciones:
+        print "sol",sol
         exp = ""
         for cam in camino[sol[1]]:
             if cerraduras.has_key(cam['ne']):
@@ -575,41 +602,21 @@ def printRegExp():
     camino.append([])
     exp = calcularRegExp(0,'',0,0);
     cargarGridSalida(False)
-    print Soluciones
     printText(310,555,orderSolution(),25,BLUE,True)
-    print len(camino)
-    print camino
+    
+    print Soluciones
+#    print len(camino)
+#    print camino
+#    print cerraduras
     verCaminos()
     getRexExpByCamino()
-    
-
-
-def propiedadesRect(rect):
-    print "top",rect.top
-    print "left",rect.left
-    print "bottom",rect.bottom
-    print "right",rect.right
-    print "topleft",rect.topleft
-    print "bottomleft",rect.bottomleft
-    print "topright",rect.topright
-    print "bottomright",rect.bottomright
-    print "topleft",rect.topleft
-    print "bottomleft",rect.bottomleft
-    print "bottomright",rect.bottomright
-    print "midtop",rect.midtop
-    print "center",rect.center
-    print "centerx",rect.centerx
-    print "centery",rect.centery
-    print "size",rect.size
-    print "width",rect.width
-    print "height",rect.height
 
 def main():
     pygame.init()
     # creamos la ventana y le indicamos un titulo:
     global screen
-#    screen = pygame.display.set_mode((PantX, PantY))
-    screen = pygame.display.set_mode((10, 10))
+    screen = pygame.display.set_mode((PantX, PantY))
+    #screen = pygame.display.set_mode((10, 10))
     pygame.display.set_caption("Conversión Autómata!")
     screen.fill(WHITE)
     clock = pygame.time.Clock()
@@ -622,47 +629,16 @@ def main():
     Aristas=[]
     Alfabeto = ['a','b','c']
     Soluciones=[]
-
-    #TEST
-    #Automata 1
-    arrayEstados.append( {'rec': (78, 398, 40, 40), 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0}]})
-    arrayEstados.append({'rec': (147, 334, 40, 40), 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 3, 'sim': 0}, {'sig': 2, 'sim': 0}]})
-    arrayEstados.append({'rec': (211, 380, 40, 40), 'aceptacion': 0, 'nestado': 2, 'aristas': [{'sig': 3, 'sim': 1}, {'sig': 4, 'sim': 1}]})
-    arrayEstados.append({'rec': (157, 442, 40, 40), 'aceptacion': 1, 'nestado': 3, 'aristas': []})
-    arrayEstados.append({'rec': (313, 364, 40, 40), 'aceptacion': 0, 'nestado': 4, 'aristas': [{'sig': 5, 'sim': 0},{'sig': 7, 'sim': 2}, ]})
-    arrayEstados.append({'rec': (400, 334, 40, 40), 'aceptacion': 0, 'nestado': 5, 'aristas': [{'sig': 10, 'sim': 1},{'sig': 6, 'sim': 1}, ]})
-    arrayEstados.append({'rec': (438, 390, 40, 40), 'aceptacion': 0, 'nestado': 6, 'aristas': [{'sig': 7, 'sim': 1}, ]})
-    arrayEstados.append({'rec': (429, 456, 40, 40), 'aceptacion': 0, 'nestado': 7, 'aristas': [{'sig': 8, 'sim': 0}]})
-    arrayEstados.append({'rec': (316, 470, 40, 40), 'aceptacion': 0, 'nestado': 8, 'aristas': [{'sig': 9, 'sim': 1}]})
-    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado': 9, 'aristas': [{'sig': 3, 'sim': 1}]})
-    
-    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':10, 'aristas': [{'sig':11, 'sim': 1}]})
-    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':11, 'aristas': [{'sig':12, 'sim': 2}]})
-    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':12, 'aristas': [{'sig':13, 'sim': 0},{'sig': 3, 'sim': 2}]})
-    #arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':13, 'aristas': [{'sig': 3, 'sim': 1},]})
-    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':13, 'aristas': [{'sig': 3, 'sim': 1},]})
-#    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':13, 'aristas': []})
-    #[, , , , , , , , , ]
-    #[{'rec': (78, 398, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 1, 'sim': 0}], 'nestado': 0}, {'rec': (147, 334, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 3, 'sim': 0}, {'sig': 2, 'sim': 0}], 'nestado': 1}, {'rec': (211, 380, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 3, 'sim': 1}, {'sig': 4, 'sim': 1}], 'nestado': 2}, {'rec': (157, 442, 40, 40), 'aceptacion': 1, 'aristas': [], 'nestado': 3}, {'rec': (313, 364, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 5, 'sim': 0}, {'sig': 7, 'sim': 2}], 'nestado': 4}, {'rec': (400, 334, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 6, 'sim': 1}], 'nestado': 5}, {'rec': (438, 390, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 7, 'sim': 1}], 'nestado': 6}, {'rec': (429, 456, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 8, 'sim': 0}], 'nestado': 7}, {'rec': (316, 470, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 9, 'sim': 1}], 'nestado': 8}, {'rec': (227, 464, 40, 40), 'aceptacion': 0, 'aristas': [{'sig': 3, 'sim': 1}], 'nestado': 9}]
-    printRegExp()
-    print "-->",cerraduras
-    #Automata 2
-    arrayEstados=[]
-    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0}]})
-    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 2, 'sim': 1}]})
-    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 2, 'aristas': [{'sig': 5, 'sim': 2},{'sig': 3, 'sim': 2},{'sig': 4, 'sim': 0}]})
-    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 3, 'aristas': [{'sig': 4, 'sim': 2}]})
-    arrayEstados.append( {'rec': 0, 'aceptacion': 1, 'nestado': 4, 'aristas': []})
-    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 5, 'aristas': [{'sig': 0, 'sim': 1}]})
-    
-    printRegExp()
-    
-    arrayEstados=[]
-    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0}]})
-    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 2, 'sim': 2},{'sig': 0, 'sim': 1}]})
-    arrayEstados.append( {'rec': 0, 'aceptacion': 1, 'nestado': 2, 'aristas': []})
-    
-    printRegExp()
+   
+#    arrayEstados=[]
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0},]})
+#    #arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 1, 'aristas': [ {'sig': 2, 'sim': 2}, {'sig': 3, 'sim': 1}]})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 1, 'aristas': [ {'sig': 3, 'sim': 1},{'sig': 2, 'sim': 2}, ]})
+#    #arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 1, 'sim': 1} ,{'sig': 2, 'sim': 2}, ]})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 1, 'nestado': 2, 'aristas': []})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 3, 'aristas': [{'sig': 1, 'sim': 0}]})
+#    
+#    printRegExp()
 
     
     nTipoEstado = 0
@@ -710,26 +686,3 @@ def main():
 if __name__ == "__main__":
     main()
     
-    
-#[['aaa', 2], ['aaaaaaaa', 8], ['aa', 1]]
-#-- 0: 0,0  1,0  2,0  
-#-- 1: 0,0  1,0  2,1  4,0  5,0  6,0  7,0  8,0  1,1  
-#-- 2: 0,0  1,0  2,1  4,0  5,0  6,0  7,0  4,1  
-#-- 3: 0,0  1,0  
-
-
-#-- 0:    0,0  1,0  
-#-- 1:    0,0  1,1  2,0  
-#-- 2:    0,0  1,1  2,1  4,0  5,0  6,0  7,0  8,0  9,0  
-#-- 3:    0,0  1,1  2,1  4,0  5,1  10,0  11,0  12,0  13,0  4,1  
-#-- 4:    0,0  1,1  2,1  7,0  8,0  9,0 
-
-#-- 0:    0,0  1,0  
-#-- 1:    0,0  1,1  2,0  
-#-- 2:    0,0  1,1  2,1  4,0  5,0  6,0  7,0  8,0  9,0  
-#-- 3:    0,0  1,1  2,1  4,0  5,1  10,0  11,0  12,0  13,0  4,1  7,0  8,0  9,0  
-#-- 4:    0,0  1,1  2,1  
-
-#[[{'ia': 0, 'bif': 1, 'ne': 0, 'sim': 0}, {'ia': 0, 'bif': 1, 'ne': 1, 'sim': 1}, {'ia': 0, 'bif': 2, 'ne': 2, 'sim': 2}, {'ia': 0, 'bif': 1, 'ne': 5, 'sim': 1}], ]
-
-#[{'ia': 0, 'bif': 1, 'ne': 0, 'sim': 0}, {'ia': 0, 'bif': 1, 'ne': 1, 'sim': 1}, {'ia': 1, 'bif': 2, 'ne': 2, 'sim': 2}, {'ia': 0, 'bif': 1, 'ne': 3, 'sim': 2}]

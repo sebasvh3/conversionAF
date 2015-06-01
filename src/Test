@@ -1,0 +1,30 @@
+ #TEST
+    #Automata 1
+#    arrayEstados.append( {'rec': (78, 398, 40, 40), 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0}]})
+#    arrayEstados.append({'rec': (147, 334, 40, 40), 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 3, 'sim': 0}, {'sig': 2, 'sim': 0}]})
+#    arrayEstados.append({'rec': (211, 380, 40, 40), 'aceptacion': 0, 'nestado': 2, 'aristas': [{'sig': 3, 'sim': 1}, {'sig': 4, 'sim': 1}]})
+#    arrayEstados.append({'rec': (157, 442, 40, 40), 'aceptacion': 1, 'nestado': 3, 'aristas': []})
+#    arrayEstados.append({'rec': (313, 364, 40, 40), 'aceptacion': 0, 'nestado': 4, 'aristas': [{'sig': 5, 'sim': 0},{'sig': 7, 'sim': 2}, ]})
+#    arrayEstados.append({'rec': (400, 334, 40, 40), 'aceptacion': 0, 'nestado': 5, 'aristas': [{'sig': 10, 'sim': 1},{'sig': 6, 'sim': 1}, ]})
+#    arrayEstados.append({'rec': (438, 390, 40, 40), 'aceptacion': 0, 'nestado': 6, 'aristas': [{'sig': 7, 'sim': 1}, ]})
+#    arrayEstados.append({'rec': (429, 456, 40, 40), 'aceptacion': 0, 'nestado': 7, 'aristas': [{'sig': 8, 'sim': 0}]})
+#    arrayEstados.append({'rec': (316, 470, 40, 40), 'aceptacion': 0, 'nestado': 8, 'aristas': [{'sig': 9, 'sim': 1}]})
+#    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado': 9, 'aristas': [{'sig': 3, 'sim': 1}]})
+#    
+#    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':10, 'aristas': [{'sig':11, 'sim': 1}]})
+#    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':11, 'aristas': [{'sig':12, 'sim': 2}]})
+#    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':12, 'aristas': [{'sig':13, 'sim': 0},{'sig': 3, 'sim': 2}]})
+#    #arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':13, 'aristas': [{'sig': 3, 'sim': 1},]})
+#    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':13, 'aristas': [{'sig': 3, 'sim': 1},]})
+#    arrayEstados.append({'rec': (227, 464, 40, 40), 'aceptacion': 0, 'nestado':13, 'aristas': []})
+#    printRegExp()
+    #Automata 2
+#    arrayEstados=[]
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 0, 'aristas': [{'sig': 1, 'sim': 0}]})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 1, 'aristas': [{'sig': 2, 'sim': 1}]})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 2, 'aristas': [{'sig': 5, 'sim': 2},{'sig': 3, 'sim': 2},{'sig': 4, 'sim': 0}]})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 3, 'aristas': [{'sig': 4, 'sim': 2}]})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 1, 'nestado': 4, 'aristas': []})
+#    arrayEstados.append( {'rec': 0, 'aceptacion': 0, 'nestado': 5, 'aristas': [{'sig': 0, 'sim': 1}]})
+    
+#    printRegExp()
